@@ -209,26 +209,59 @@ body.lit .vig{opacity:0}
   opacity:0;
   pointer-events:none;
   background:#000;
-  padding:calc(var(--pad) * 3.4) var(--pad) calc(var(--pad) * 4);
+  padding:0;
   transition:opacity .6s ease;
 }
 body.gridview #grid{
   opacity:1;
   pointer-events:auto;
 }
-.rows{
-  display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
-  gap:clamp(10px, 1.4vw, 20px);
+.plane{
+  position:relative;
   width:min(1680px, 100%);
-  margin:0;
   flex:none;
   transform-origin:center center;
   will-change:transform;
 }
-@media (pointer:coarse){
-  #grid{display:block;overflow:auto;-webkit-overflow-scrolling:touch}
-  .rows{width:auto;max-width:1680px;margin:0 auto}
+.plane.arriving figure{opacity:0}
+.rows{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:clamp(10px, 1.4vw, 20px);
+  width:100%;
+  margin:0;
+}
+.tile-copy{
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+}
+.card-flight{
+  position:fixed;
+  z-index:70;
+  object-fit:cover;
+  border-radius:3px;
+  pointer-events:none;
+  transform-origin:center center;
+}
+.fold-flyer{
+  pointer-events:none;
+  z-index:5;
+  border-radius:3px;
+  overflow:hidden;
+}
+.fold-flyer img{opacity:1 !important;transition:none !important}
+body.returning #stage{
+  opacity:1;
+  filter:none;
+  transition:none;
+  pointer-events:none;
+}
+body.returning #grid{
+  opacity:0;
+  transition:none;
+  pointer-events:none;
 }
 #grid figure{
   position:relative;
@@ -284,12 +317,10 @@ header.chrome{
   justify-content:space-between;
   align-items:flex-start;
   padding:calc(var(--pad) * .8 + var(--safe-top)) calc(var(--pad) + var(--safe-right)) calc(var(--pad) * .35) calc(var(--pad) + var(--safe-left));
-  mix-blend-mode:difference;
   pointer-events:none;
 }
 body.menu-open header.chrome{
   z-index:90;
-  mix-blend-mode:normal;
 }
 .wordmark{
   font-family:var(--serif);
@@ -301,7 +332,9 @@ body.menu-open header.chrome{
   text-decoration:none;
   white-space:nowrap;
   pointer-events:auto;
+  mix-blend-mode:difference;
 }
+body.menu-open .wordmark{mix-blend-mode:normal}
 .wordmark em,.mark em{font-style:normal}
 .wm-open{display:none}
 body.menu-open .wm-closed{display:none}
@@ -309,14 +342,38 @@ body.menu-open .wm-open{display:inline}
 body.menu-open .wordmark{color:#fff}
 .menu-btn{
   display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  gap:5px;
+  align-items:center;
+  justify-content:flex-end;
+  gap:12px;
   min-width:var(--tap);
   min-height:var(--tap);
-  padding:8px 0 4px;
+  padding:0;
   pointer-events:auto;
 }
+.menu-mark{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#fff;
+  display:block;
+}
+body.menu-open .menu-mark{display:none}
+body.logo-away .menu-mark{visibility:hidden}
+.logo-flight{
+  position:fixed;
+  z-index:95;
+  border-radius:50%;
+  object-fit:cover;
+  background:#fff;
+  pointer-events:none;
+  transform-origin:center center;
+}
+#menu.logo-fly .core{opacity:0 !important;transition:none !important}
+.menu-btn .menu-label,
+.menu-btn .bars{display:none}
+body.menu-open .menu-btn .menu-label{display:inline}
+body.menu-open .menu-btn .bars{display:block}
 .menu-label{
   font-size:clamp(14px, 1.2vw, 16px);
   letter-spacing:.01em;
@@ -378,18 +435,6 @@ body.menu-open .menu-btn:hover .bars i:nth-child(2){transform:translateY(0) rota
   z-index:55;
   max-width:min(320px, 46vw);
   transition:opacity 1.2s var(--ease) .15s, transform .5s var(--ease);
-}
-.who{
-  margin-bottom:14px;
-}
-#avatar{
-  width:52px;
-  height:52px;
-  border-radius:50%;
-  object-fit:cover;
-  object-position:center;
-  background:#fff;
-  flex:none;
 }
 .bio p{
   font-size:12.5px;
@@ -921,8 +966,7 @@ body.lit #lit{
   .colophon{font-size:11px}
   .meta{grid-template-columns:1fr;gap:10px;padding-top:14px}
   .plate{width:min(92vw, calc((100dvh - 220px) * 1.5))}
-  .rows{grid-template-columns:repeat(auto-fill, minmax(150px, 1fr))}
-  #grid{padding-top:calc(var(--pad) * 2.8 + var(--safe-top))}
+  .rows{grid-template-columns:repeat(3, 1fr)}
 }
 @media (max-width:768px){
   .colophon{display:none}
@@ -935,7 +979,6 @@ body.lit #lit{
     --hw:min(84vw, 360px);
     --pad:clamp(12px, 4vw, 18px);
   }
-  #avatar{width:42px;height:42px}
   .bio p{font-size:11.5px;line-height:1.55}
   .cue{display:none}
   .studio{align-items:flex-start}
@@ -948,15 +991,11 @@ body.lit #lit{
   #litTitle{font-size:clamp(20px, 5.6vw, 26px)}
   #litNote{font-size:12.5px;line-height:1.58}
   .shot button{top:8px;right:8px}
-  .rows{grid-template-columns:repeat(2, 1fr);gap:8px}
+  .rows{grid-template-columns:repeat(3, 1fr);gap:8px}
   #grid figcaption{opacity:1;transform:none;font-size:13px}
-  #grid{
-    padding:calc(var(--pad) + var(--safe-top)) calc(var(--pad) + var(--safe-right)) calc(var(--pad) + var(--safe-bottom)) calc(var(--pad) + var(--safe-left));
-  }
 }
 @media (max-width:380px){
   :root{--hw:min(88vw, 320px)}
-  .who{margin-bottom:10px}
   .bio p{display:none}
   .rows{grid-template-columns:1fr}
   .orbit{transform:scale(.7)}
@@ -992,14 +1031,12 @@ body.lit #lit{
 <header class="chrome">
   <a class="wordmark" href="#" aria-label="OVRNITE"><span class="wm-closed">OVRNITE.</span><span class="wm-open">OVRNITE.</span></a>
   <button id="menuBtn" class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
-    <span class="menu-label"><span class="when-closed">Menu</span><span class="when-open">Close</span></span>
+    <img class="menu-mark" src="logo/logo.png" alt="" width="46" height="46">
+    <span class="menu-label"><span class="when-open">Close</span></span>
     <span class="bars"><i></i><i></i></span>
   </button>
 </header>
 <aside class="bio chrome">
-  <div class="who">
-    <img id="avatar" alt="" width="52" height="52" src="logo/logo.png">
-  </div>
   <p>A multidisciplinary design and development studio. The work covers brands, digital products and the experiences around them.</p>
 </aside>
 <div class="colophon chrome">United Kingdom · USA · Saudi Arabia</div>
@@ -1103,8 +1140,6 @@ body.lit #lit{
   var splash = document.getElementById('splash');
   var bar = document.getElementById('bar');
   var dot = document.getElementById('dot');
-  var avatar = document.getElementById('avatar');
-
   var N = SHOTS.length;
   var GA = Math.PI * (3 - Math.sqrt(5));
   var cards = [];
@@ -1138,6 +1173,21 @@ body.lit #lit{
     rows.appendChild(gfig);
     el.style.opacity = '0';
     cards.push({ el: el, img: img, gridImg: gimg, x: x, y: y, z: z, lat: lat, lon: lon, op: 0, dim: -1 });
+  }
+
+  var plane = document.createElement('div');
+  plane.className = 'plane';
+  grid.insertBefore(plane, rows);
+  plane.appendChild(rows);
+  for (var gy = -1; gy <= 1; gy++) {
+    for (var gx = -1; gx <= 1; gx++) {
+      if (!gx && !gy) continue;
+      var copy = rows.cloneNode(true);
+      copy.className = 'rows tile-copy';
+      copy.setAttribute('aria-hidden', 'true');
+      copy.style.transform = 'translate(' + (gx * 100) + '%,' + (gy * 100) + '%)';
+      plane.appendChild(copy);
+    }
   }
 
   var R = 200;
@@ -1234,7 +1284,7 @@ body.lit #lit{
 
   function step() {
     var litOpen = document.body.classList.contains('lit');
-    if (!dragging && !litOpen) {
+    if (!dragging && !litOpen && !gridFlying) {
       dragX += velX;
       dragY += velY;
       velX *= 0.94;
@@ -1280,6 +1330,7 @@ body.lit #lit{
         if (i === focused) fade = 0;
       }
       fade *= gatherStart ? Math.min(1, arrive / 0.28) : 0;
+      if (document.body.classList.contains('gridview') || gridFlying) fade = 0;
       if (Math.abs(fade - c.op) > 0.004) {
         c.op = fade;
         c.el.style.opacity = fade.toFixed(3);
@@ -1297,50 +1348,346 @@ body.lit #lit{
     stepGrid();
   }
 
+  var gridPanX = 0;
+  var gridPanY = 0;
   var gridX = 0;
   var gridY = 0;
   var gridS = 1;
-  var gridFine = window.matchMedia('(hover: hover) and (pointer: fine)');
+  var gridFlying = false;
+  var gridFlights = [];
+  var gridDrag = null;
+  var gridPress = null;
+  var gridMoved = 0;
+  var gridSwallow = false;
+  var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  function wrapAxis(v, size) {
+    if (!(size > 1)) return 0;
+    var m = v % size;
+    if (m > size * 0.5) m -= size;
+    if (m < -size * 0.5) m += size;
+    return m;
+  }
+  function gridZoom() {
+    var ow = Math.max(1, rows.offsetWidth);
+    var oh = Math.max(1, rows.offsetHeight);
+    return {
+      ow: ow,
+      oh: oh,
+      s: Math.max(1.72, window.innerWidth / (1.55 * ow), window.innerHeight / (1.55 * oh))
+    };
+  }
+  function drive(n) {
+    var a = Math.abs(n);
+    if (a < 0.08) return 0;
+    var s = (a - 0.08) / 0.42;
+    return Math.sign(n) * s * s * 18;
+  }
+  function applyPlane() {
+    var z = gridZoom();
+    var x = wrapAxis(gridX, z.ow * gridS);
+    var y = wrapAxis(gridY, z.oh * gridS);
+    plane.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) scale(' + gridS.toFixed(4) + ')';
+  }
   function stepGrid() {
     var open = document.body.classList.contains('gridview');
-    var live = open && !document.body.classList.contains('lit') && gridFine.matches;
-    var ax = 0;
-    var ay = 0;
-    var as = 1;
-    if (live) {
-      var nx = tx < 0 ? 0.5 : Math.min(1, Math.max(0, tx / Math.max(1, window.innerWidth)));
-      var ny = ty < 0 ? 0.5 : Math.min(1, Math.max(0, ty / Math.max(1, window.innerHeight)));
-      var ow = Math.max(1, rows.offsetWidth);
-      var oh = Math.max(1, rows.offsetHeight);
-      var cover = Math.max(window.innerWidth / ow, window.innerHeight / oh);
-      as = Math.max(1.85, cover * 1.22);
-      var centerX = rows.offsetLeft + ow / 2;
-      var centerY = rows.offsetTop + oh / 2;
-      var halfW = ow * as / 2;
-      var halfH = oh * as / 2;
-      var bleed = 36;
-      var tx0 = halfW - centerX - bleed;
-      var tx1 = window.innerWidth - centerX - halfW + bleed;
-      var ty0 = halfH - centerY - bleed;
-      var ty1 = window.innerHeight - centerY - halfH + bleed;
-      ax = tx0 + (tx1 - tx0) * nx;
-      ay = ty0 + (ty1 - ty0) * ny;
-    } else if (open) {
-      ax = gridX;
-      ay = gridY;
-      as = gridS;
+    var live = open && !document.body.classList.contains('lit') && !gridFlying;
+    var z = gridZoom();
+    if (live && !gridDrag && !gridPress && finePointer.matches && tx >= 0) {
+      var nx = Math.min(1, Math.max(0, tx / Math.max(1, window.innerWidth))) - 0.5;
+      var ny = Math.min(1, Math.max(0, ty / Math.max(1, window.innerHeight))) - 0.5;
+      gridPanX -= drive(nx);
+      gridPanY -= drive(ny);
     }
-    gridX += (ax - gridX) * 0.07;
-    gridY += (ay - gridY) * 0.07;
-    gridS += (as - gridS) * 0.055;
-    if (!open && Math.abs(gridS - 1) < 0.004 && Math.abs(gridX) < 0.4 && Math.abs(gridY) < 0.4) {
-      if (rows.style.transform) rows.style.transform = '';
+    if (!gridFlying) {
+      var aimX = open ? gridPanX : 0;
+      var aimY = open ? gridPanY : 0;
+      var aimS = open ? z.s : 1;
+      gridX += (aimX - gridX) * 0.2;
+      gridY += (aimY - gridY) * 0.2;
+      gridS += (aimS - gridS) * 0.08;
+    }
+    if (!open && !gridFlying && Math.abs(gridS - 1) < 0.004 && Math.abs(gridX) < 0.5 && Math.abs(gridY) < 0.5) {
+      if (plane.style.transform) plane.style.transform = '';
       gridX = 0;
       gridY = 0;
+      gridPanX = 0;
+      gridPanY = 0;
       gridS = 1;
       return;
     }
-    rows.style.transform = 'translate3d(' + gridX.toFixed(2) + 'px,' + gridY.toFixed(2) + 'px,0) scale(' + gridS.toFixed(4) + ')';
+    applyPlane();
+  }
+  function clearFlights() {
+    for (var i = 0; i < gridFlights.length; i++) {
+      if (gridFlights[i].parentNode) gridFlights[i].parentNode.removeChild(gridFlights[i]);
+    }
+    gridFlights = [];
+    plane.classList.remove('arriving');
+    gridFlying = false;
+  }
+  function flightStart(el) {
+    var r = el.getBoundingClientRect();
+    var cx = r.left + r.width / 2;
+    var cy = r.top + r.height / 2;
+    var w = r.width;
+    var h = r.height;
+    if (w < 48 || h < 32) {
+      w = Math.max(w, 110);
+      h = Math.max(h, 74);
+    }
+    if (cx < -20 || cy < -20 || cx > window.innerWidth + 20 || cy > window.innerHeight + 20) {
+      cx = Math.min(window.innerWidth + 24, Math.max(-24, cx));
+      cy = Math.min(window.innerHeight + 24, Math.max(-24, cy));
+    }
+    return { left: cx - w / 2, top: cy - h / 2, width: w, height: h };
+  }
+  function flyBetween(froms, tos, done) {
+    var jobs = [];
+    for (var i = 0; i < froms.length; i++) {
+      if (froms[i] && tos[i] && froms[i].width >= 2 && tos[i].width >= 2) jobs.push(i);
+    }
+    if (!jobs.length || reduceMotion) { done(); return; }
+    var left = jobs.length;
+    var finished = false;
+    function one() {
+      left--;
+      if (left <= 0 && !finished) { finished = true; done(); }
+    }
+    for (var j = 0; j < jobs.length; j++) {
+      (function (i) {
+        var a = froms[i];
+        var b = tos[i];
+        var flyer = document.createElement('img');
+        flyer.className = 'card-flight';
+        flyer.alt = '';
+        var shot = cards[i % cards.length];
+        flyer.src = shot.gridImg.getAttribute('src') || shot.img.getAttribute('src') || '';
+        flyer.style.left = a.left + 'px';
+        flyer.style.top = a.top + 'px';
+        flyer.style.width = a.width + 'px';
+        flyer.style.height = a.height + 'px';
+        document.body.appendChild(flyer);
+        gridFlights.push(flyer);
+        var dx = (b.left + b.width / 2) - (a.left + a.width / 2);
+        var dy = (b.top + b.height / 2) - (a.top + a.height / 2);
+        var sx = b.width / a.width;
+        var sy = b.height / a.height;
+        var tf = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx + ',' + sy + ')';
+        var delay = (i % 6) * 45;
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            if (!flyer.parentNode) return;
+            flyer.style.transition = 'transform .9s cubic-bezier(.22,.61,.36,1) ' + delay + 'ms';
+            flyer.style.transform = tf;
+          });
+        });
+        flyer.addEventListener('transitionend', function (e) {
+          if (e.propertyName !== 'transform') return;
+          one();
+        });
+      })(jobs[j]);
+    }
+    setTimeout(function () { if (!finished) { finished = true; done(); } }, 1900);
+  }
+  function enterGrid() {
+    if (gridFlying || document.body.classList.contains('gridview')) return;
+    var froms = [];
+    for (var n = 0; n < cards.length; n++) froms.push(flightStart(cards[n].el));
+    gridPanX = 0;
+    gridPanY = 0;
+    gridX = 0;
+    gridY = 0;
+    gridS = gridZoom().s;
+    document.body.classList.add('gridview');
+    plane.classList.add('arriving');
+    applyPlane();
+    var tos = [];
+    for (var i = 0; i < cards.length; i++) tos.push(rows.children[i].getBoundingClientRect());
+    if (reduceMotion) { plane.classList.remove('arriving'); return; }
+    gridFlying = true;
+    var ended = false;
+    flyBetween(froms, tos, function () {
+      if (ended) return;
+      ended = true;
+      clearFlights();
+    });
+  }
+  function visibleCell(i) {
+    var figs = plane.querySelectorAll('figure[data-idx="' + i + '"]');
+    var best = null;
+    var bestScore = Infinity;
+    var cx0 = window.innerWidth / 2;
+    var cy0 = window.innerHeight / 2;
+    for (var k = 0; k < figs.length; k++) {
+      var r = figs[k].getBoundingClientRect();
+      if (r.width < 2 || r.height < 2) continue;
+      var dx = r.left + r.width / 2 - cx0;
+      var dy = r.top + r.height / 2 - cy0;
+      var on = r.right > 0 && r.bottom > 0 && r.left < window.innerWidth && r.top < window.innerHeight;
+      var score = Math.hypot(dx, dy) + (on ? 0 : 100000);
+      if (score < bestScore) { bestScore = score; best = r; }
+    }
+    return best;
+  }
+  function quatFromMat(m) {
+    var m11 = m.m11, m12 = m.m12, m13 = m.m13;
+    var m21 = m.m21, m22 = m.m22, m23 = m.m23;
+    var m31 = m.m31, m32 = m.m32, m33 = m.m33;
+    var tr = m11 + m22 + m33;
+    var q = [0, 0, 0, 1];
+    var s;
+    if (tr > 0) {
+      s = Math.sqrt(tr + 1) * 2;
+      q[3] = 0.25 * s;
+      q[0] = (m32 - m23) / s;
+      q[1] = (m13 - m31) / s;
+      q[2] = (m21 - m12) / s;
+    } else if (m11 > m22 && m11 > m33) {
+      s = Math.sqrt(1 + m11 - m22 - m33) * 2;
+      q[3] = (m32 - m23) / s;
+      q[0] = 0.25 * s;
+      q[1] = (m12 + m21) / s;
+      q[2] = (m13 + m31) / s;
+    } else if (m22 > m33) {
+      s = Math.sqrt(1 + m22 - m11 - m33) * 2;
+      q[3] = (m13 - m31) / s;
+      q[0] = (m12 + m21) / s;
+      q[1] = 0.25 * s;
+      q[2] = (m23 + m32) / s;
+    } else {
+      s = Math.sqrt(1 + m33 - m11 - m22) * 2;
+      q[3] = (m21 - m12) / s;
+      q[0] = (m13 + m31) / s;
+      q[1] = (m23 + m32) / s;
+      q[2] = 0.25 * s;
+    }
+    var len = Math.hypot(q[0], q[1], q[2], q[3]) || 1;
+    return [q[0] / len, q[1] / len, q[2] / len, q[3] / len];
+  }
+  function poseParts(transform) {
+    var m = new DOMMatrix(transform);
+    var sx = Math.hypot(m.m11, m.m12, m.m13) || 1;
+    var sy = Math.hypot(m.m21, m.m22, m.m23) || 1;
+    var sz = Math.hypot(m.m31, m.m32, m.m33) || 1;
+    var r = new DOMMatrix(m);
+    r.m11 /= sx; r.m12 /= sx; r.m13 /= sx;
+    r.m21 /= sy; r.m22 /= sy; r.m23 /= sy;
+    r.m31 /= sz; r.m32 /= sz; r.m33 /= sz;
+    return { q: quatFromMat(r), t: [m.m41, m.m42, m.m43], s: (sx + sy + sz) / 3 };
+  }
+  function slerpQuat(a, b, t) {
+    var dot = a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+    if (dot < 0) { b = [-b[0], -b[1], -b[2], -b[3]]; dot = -dot; }
+    if (dot > 0.9995) {
+      var q = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t, a[3] + (b[3] - a[3]) * t];
+      var l = Math.hypot(q[0], q[1], q[2], q[3]) || 1;
+      return [q[0] / l, q[1] / l, q[2] / l, q[3] / l];
+    }
+    var th = Math.acos(Math.min(1, dot));
+    var st = Math.sin(th);
+    var w1 = Math.sin((1 - t) * th) / st;
+    var w2 = Math.sin(t * th) / st;
+    return [a[0] * w1 + b[0] * w2, a[1] * w1 + b[1] * w2, a[2] * w1 + b[2] * w2, a[3] * w1 + b[3] * w2];
+  }
+  function matFromPose(q, t, s) {
+    var x = q[0], y = q[1], z = q[2], w = q[3];
+    var m = new DOMMatrix();
+    m.m11 = (1 - 2 * (y * y + z * z)) * s;
+    m.m12 = (2 * (x * y - z * w)) * s;
+    m.m13 = (2 * (x * z + y * w)) * s;
+    m.m21 = (2 * (x * y + z * w)) * s;
+    m.m22 = (1 - 2 * (x * x + z * z)) * s;
+    m.m23 = (2 * (y * z - x * w)) * s;
+    m.m31 = (2 * (x * z - y * w)) * s;
+    m.m32 = (2 * (y * z + x * w)) * s;
+    m.m33 = (1 - 2 * (x * x + y * y)) * s;
+    m.m41 = t[0];
+    m.m42 = t[1];
+    m.m43 = t[2];
+    return m;
+  }
+  function foldBack(fromRects) {
+    var sx = tilt + dragY;
+    var sy = spin + dragX;
+    var P = perspective;
+    var cw = cards[0].el.offsetWidth;
+    var done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      gridFlying = false;
+      step();
+      clearFlights();
+      document.body.classList.remove('returning');
+    }
+    if (reduceMotion || !(cw > 0)) { finish(); return; }
+    var jobs = [];
+    for (var i = 0; i < cards.length; i++) {
+      var rect = fromRects[i];
+      if (!rect) continue;
+      var fit = Math.max(0.08, rect.width / cw);
+      var bx = (rect.left + rect.width / 2 - window.innerWidth / 2) / fit;
+      var by = (rect.top + rect.height / 2 - window.innerHeight / 2) / fit;
+      var bz = P - camZ - P / fit;
+      var start = 'rotateX(' + (-sx).toFixed(2) + 'deg) rotateY(' + (-sy).toFixed(2) + 'deg) translate3d(' + bx.toFixed(2) + 'px,' + by.toFixed(2) + 'px,' + bz.toFixed(2) + 'px)';
+      var end = cards[i].el.style.transform || ('translate3d(' + (cards[i].x * R).toFixed(2) + 'px,' + (-cards[i].y * R).toFixed(2) + 'px,' + (cards[i].z * R).toFixed(2) + 'px) rotateY(' + cards[i].lon + 'deg) rotateX(' + cards[i].lat + 'deg) scale(1)');
+      var flyer = document.createElement('div');
+      flyer.className = 'card fold-flyer';
+      var img = document.createElement('img');
+      img.alt = '';
+      img.draggable = false;
+      img.src = cards[i].gridImg.getAttribute('src') || cards[i].img.getAttribute('src') || '';
+      flyer.appendChild(img);
+      flyer.style.transform = start;
+      orb.appendChild(flyer);
+      gridFlights.push(flyer);
+      jobs.push({ el: flyer, a: poseParts(start), b: poseParts(end), endStr: end, delay: (i % 6) * 36 });
+    }
+    if (!jobs.length) { finish(); return; }
+    var t0 = performance.now();
+    function frame(now) {
+      if (done) return;
+      var allDone = true;
+      for (var j = 0; j < jobs.length; j++) {
+        var job = jobs[j];
+        var u = (now - t0 - job.delay) / 980;
+        if (u < 1) allDone = false;
+        if (u <= 0) continue;
+        if (u >= 1) { job.el.style.transform = job.endStr; continue; }
+        var e = 1 - Math.pow(1 - u, 3);
+        var q = slerpQuat(job.a.q, job.b.q, e);
+        var t = [
+          job.a.t[0] + (job.b.t[0] - job.a.t[0]) * e,
+          job.a.t[1] + (job.b.t[1] - job.a.t[1]) * e,
+          job.a.t[2] + (job.b.t[2] - job.a.t[2]) * e
+        ];
+        var sc = job.a.s + (job.b.s - job.a.s) * e;
+        job.el.style.transform = matFromPose(q, t, sc).toString();
+      }
+      if (allDone) finish();
+      else requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+    setTimeout(finish, 1700);
+  }
+  function leaveGrid() {
+    if (!document.body.classList.contains('gridview')) return;
+    if (reduceMotion || gridFlying) {
+      clearFlights();
+      gridPanX = 0;
+      gridPanY = 0;
+      document.body.classList.remove('gridview');
+      document.body.classList.remove('returning');
+      return;
+    }
+    var froms = [];
+    for (var i = 0; i < cards.length; i++) froms.push(visibleCell(i));
+    gridFlying = true;
+    document.body.classList.add('returning');
+    document.body.classList.remove('gridview');
+    gridPanX = 0;
+    gridPanY = 0;
+    foldBack(froms);
   }
 
   layout();
@@ -1528,10 +1875,67 @@ body.lit #lit{
     if (e.target === lit || (e.target.closest && e.target.closest('[data-close]'))) closeShot();
   });
   grid.addEventListener('click', function (e) {
+    if (gridSwallow) { gridSwallow = false; return; }
+    if (gridMoved > 8) { gridMoved = 0; return; }
     var fig = e.target.closest ? e.target.closest('figure') : null;
     if (!fig || !grid.contains(fig)) return;
     openShot(Number(fig.dataset.idx), fig);
   });
+  grid.addEventListener('pointerdown', function (e) {
+    if (!document.body.classList.contains('gridview') || document.body.classList.contains('lit')) return;
+    if (e.button !== undefined && e.button !== 0) return;
+    var fig = e.target.closest ? e.target.closest('figure') : null;
+    gridPress = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      fig: fig && grid.contains(fig) ? fig : null
+    };
+    gridDrag = null;
+    gridMoved = 0;
+  });
+  grid.addEventListener('pointermove', function (e) {
+    if (!gridPress || e.pointerId !== gridPress.id) return;
+    var dx = e.clientX - gridPress.x;
+    var dy = e.clientY - gridPress.y;
+    if (!gridDrag) {
+      if (Math.hypot(dx, dy) < 8) return;
+      gridDrag = { id: e.pointerId };
+      gridMoved = 8;
+      try { grid.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+    gridPress.x = e.clientX;
+    gridPress.y = e.clientY;
+    gridMoved += Math.abs(dx) + Math.abs(dy);
+    gridPanX += dx;
+    gridPanY += dy;
+  });
+  function endGridDrag(e) {
+    if (!gridPress || (e && e.pointerId !== gridPress.id)) return;
+    var press = gridPress;
+    var moved = gridMoved;
+    gridDrag = null;
+    gridPress = null;
+    gridMoved = 0;
+    gridSwallow = true;
+    setTimeout(function () { gridSwallow = false; }, 350);
+    if (moved > 8) return;
+    if (press.fig && grid.contains(press.fig)) openShot(Number(press.fig.dataset.idx), press.fig);
+  }
+  grid.addEventListener('pointerup', endGridDrag);
+  grid.addEventListener('pointercancel', function (e) {
+    if (!gridPress || (e && e.pointerId !== gridPress.id)) return;
+    gridPress = null;
+    gridDrag = null;
+    gridMoved = 0;
+  });
+  window.addEventListener('wheel', function (e) {
+    if (!document.body.classList.contains('gridview') || document.body.classList.contains('lit')) return;
+    e.preventDefault();
+    var unit = e.deltaMode === 1 ? 32 : (e.deltaMode === 2 ? window.innerHeight : 1);
+    gridPanX -= e.deltaX * unit;
+    gridPanY -= e.deltaY * unit;
+  }, { passive: false });
 
   var STUDIO = {
     about: {
@@ -1614,21 +2018,110 @@ body.lit #lit{
   function leaveStudio() {
     menu.classList.remove('reading');
   }
+  var logoFlight = null;
+  var logoHome = null;
+  var logoTimer = 0;
+  function endLogoFlight(flyer) {
+    if (flyer && logoFlight !== flyer) return;
+    if (logoTimer) { clearTimeout(logoTimer); logoTimer = 0; }
+    var core = menu.querySelector('.core');
+    var opening = menu.classList.contains('open');
+    if (core && opening) {
+      core.style.transition = 'none';
+      core.style.opacity = '1';
+      core.style.transform = 'scale(1)';
+    }
+    document.body.classList.remove('logo-away');
+    menu.classList.remove('logo-fly');
+    if (logoFlight && logoFlight.parentNode) logoFlight.parentNode.removeChild(logoFlight);
+    logoFlight = null;
+    if (core && opening) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          core.style.transition = '';
+          core.style.opacity = '';
+          core.style.transform = '';
+        });
+      });
+    }
+  }
+  function launchLogo(from, to) {
+    endLogoFlight();
+    if (!from || !to || from.width < 2 || to.width < 2 || reduceMotion) return;
+    var flyer = document.createElement('img');
+    flyer.className = 'logo-flight';
+    flyer.src = 'logo/logo.png';
+    flyer.alt = '';
+    flyer.style.left = from.left + 'px';
+    flyer.style.top = from.top + 'px';
+    flyer.style.width = from.width + 'px';
+    flyer.style.height = from.height + 'px';
+    document.body.appendChild(flyer);
+    logoFlight = flyer;
+    menu.classList.add('logo-fly');
+    var dx = (to.left + to.width / 2) - (from.left + from.width / 2);
+    var dy = (to.top + to.height / 2) - (from.top + from.height / 2);
+    var sc = to.width / from.width;
+    requestAnimationFrame(function () {
+      if (logoFlight !== flyer) return;
+      flyer.style.transition = 'transform .9s cubic-bezier(.22,.61,.36,1)';
+      flyer.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')';
+    });
+    var finish = function (e) {
+      if (e.propertyName !== 'transform') return;
+      flyer.removeEventListener('transitionend', finish);
+      endLogoFlight(flyer);
+    };
+    flyer.addEventListener('transitionend', finish);
+    logoTimer = setTimeout(function () { endLogoFlight(flyer); }, 1100);
+  }
+  function menuLogoTarget() {
+    var orbit = menu.querySelector('.orbit');
+    var core = menu.querySelector('.core');
+    var anchor = orbit.getBoundingClientRect();
+    var scale = 1;
+    var matrix = getComputedStyle(orbit).transform;
+    if (matrix && matrix !== 'none') {
+      var parts = matrix.match(/matrix\(([^)]+)\)/);
+      if (parts) scale = parseFloat(parts[1].split(',')[0]) || 1;
+    }
+    var size = (core.offsetWidth || 300) * scale;
+    return { left: anchor.left - size / 2, top: anchor.top - size / 2, width: size, height: size };
+  }
   function closeMenu() {
+    var core = menu.querySelector('.core');
+    var fromEl = logoFlight || core;
+    var from = fromEl ? fromEl.getBoundingClientRect() : null;
+    var to = logoHome;
     leaveStudio();
     menu.classList.remove('open');
     document.body.classList.remove('menu-open');
     menu.setAttribute('aria-hidden', 'true');
     menuBtn.setAttribute('aria-expanded', 'false');
     menuBtn.setAttribute('aria-label', 'Open menu');
+    if (from && to && from.width > 2) {
+      launchLogo(from, to);
+      document.body.classList.add('logo-away');
+    } else {
+      document.body.classList.remove('logo-away');
+    }
+  }
+  function openMenu() {
+    var mark = menuBtn.querySelector('.menu-mark');
+    var from = mark.getBoundingClientRect();
+    logoHome = { left: from.left, top: from.top, width: from.width, height: from.height };
+    var to = menuLogoTarget();
+    menu.classList.add('logo-fly');
+    menu.classList.add('open');
+    document.body.classList.add('menu-open');
+    menu.setAttribute('aria-hidden', 'false');
+    menuBtn.setAttribute('aria-expanded', 'true');
+    menuBtn.setAttribute('aria-label', 'Close menu');
+    launchLogo(from, to);
   }
   function toggleMenu() {
-    var open = !menu.classList.contains('open');
-    menu.classList.toggle('open', open);
-    document.body.classList.toggle('menu-open', open);
-    menu.setAttribute('aria-hidden', open ? 'false' : 'true');
-    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    if (menu.classList.contains('open')) closeMenu();
+    else openMenu();
   }
   menuBtn.addEventListener('click', toggleMenu);
   menu.addEventListener('click', function (e) {
@@ -1643,10 +2136,11 @@ body.lit #lit{
     if (key) { showStudio(key); return; }
     var toGrid = a.hasAttribute('data-grid');
     closeMenu();
-    if (toGrid) document.body.classList.add('gridview');
+    if (toGrid) enterGrid();
   });
   gridBtn.addEventListener('click', function () {
-    document.body.classList.toggle('gridview');
+    if (document.body.classList.contains('gridview')) leaveGrid();
+    else enterGrid();
   });
   document.querySelector('.wordmark').addEventListener('click', function (e) {
     e.preventDefault();
@@ -1656,7 +2150,7 @@ body.lit #lit{
     if (document.body.classList.contains('lit')) { closeShot(); return; }
     if (menu.classList.contains('reading')) { leaveStudio(); return; }
     if (menu.classList.contains('open')) { closeMenu(); return; }
-    if (document.body.classList.contains('gridview')) document.body.classList.remove('gridview');
+    if (document.body.classList.contains('gridview')) { leaveGrid(); return; }
   });
 
   window.addEventListener('pointermove', function (e) {
@@ -1875,10 +2369,11 @@ body.lit #lit{
       cards[i].img.src = url;
       cards[i].img.classList.add('in');
       cards[i].gridImg.src = url;
+      var mates = plane.querySelectorAll('figure[data-idx="' + i + '"] img');
+      for (var m = 0; m < mates.length; m++) if (mates[m] !== cards[i].gridImg) mates[m].src = url;
       bump();
     });
   });
-  avatar.src = 'logo/logo.png';
 })();
 </script>
 </body>
