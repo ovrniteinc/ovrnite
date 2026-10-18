@@ -1136,7 +1136,8 @@ body.lit #lit{
     gfig.appendChild(gimg);
     gfig.appendChild(cap);
     rows.appendChild(gfig);
-    cards.push({ el: el, img: img, gridImg: gimg, x: x, y: y, z: z, lat: lat, lon: lon, op: -1, dim: -1 });
+    el.style.opacity = '0';
+    cards.push({ el: el, img: img, gridImg: gimg, x: x, y: y, z: z, lat: lat, lon: lon, op: 0, dim: -1 });
   }
 
   var R = 200;
@@ -1152,23 +1153,45 @@ body.lit #lit{
   var focused = -1;
   var holdP = null;
   var savedScroll = 0;
+  var gatherStart = 0;
+  var gathered = false;
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function gatherEase(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+  function cardArrive(i, now) {
+    if (gathered || reduceMotion) return gatherStart ? 1 : 0;
+    if (!gatherStart) return 0;
+    var t = (now - gatherStart - i * 46) / 1320;
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    return gatherEase(t);
+  }
+  function poseCard(c, i, now) {
+    var k = cardArrive(i, now);
+    var x = c.x * R * (0.12 + 0.88 * k);
+    var y = -c.y * R * (0.12 + 0.88 * k);
+    var z = c.z * R * k + (-R * 2.35) * (1 - k);
+    var sc = 0.2 + 0.8 * k;
+    c.el.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,' + z.toFixed(2) + 'px) rotateY(' + c.lon + 'deg) rotateX(' + c.lat + 'deg) scale(' + sc.toFixed(4) + ')';
+    return k;
+  }
 
   function layout() {
     var w = window.innerWidth;
     var h = window.innerHeight;
-    var hr = w <= 380 ? 0.28 : w <= 640 ? 0.30 : 0.32;
-    var wr = w <= 380 ? 0.36 : w <= 640 ? 0.40 : 0.42;
-    var floor = w <= 380 ? 100 : w <= 640 ? 112 : 124;
-    R = Math.max(floor, Math.min(360, h * hr, w * wr));
+    var hr = w <= 380 ? 0.32 : w <= 640 ? 0.34 : 0.37;
+    var wr = w <= 380 ? 0.42 : w <= 640 ? 0.46 : 0.48;
+    var floor = w <= 380 ? 112 : w <= 640 ? 126 : 140;
+    R = Math.max(floor, Math.min(410, h * hr, w * wr));
     var scale = w <= 380 ? 0.72 : w <= 640 ? 0.74 : 0.76;
     var cw = Math.round(Math.max(86, R * scale));
     perspective = w <= 380 ? 620 : w <= 640 ? 760 : w <= 900 ? 920 : 1150;
     document.documentElement.style.setProperty('--persp', perspective + 'px');
     document.documentElement.style.setProperty('--cw', cw + 'px');
-    for (var i = 0; i < cards.length; i++) {
-      var c = cards[i];
-      c.el.style.transform = 'translate3d(' + (c.x * R) + 'px,' + (-c.y * R) + 'px,' + (c.z * R) + 'px) rotateY(' + c.lon + 'deg) rotateX(' + c.lat + 'deg)';
-    }
+    var now = performance.now();
+    for (var i = 0; i < cards.length; i++) poseCard(cards[i], i, now);
   }
 
   function scrollMax() {
@@ -1237,8 +1260,15 @@ body.lit #lit{
 
     var near = perspective * 0.66;
     var shade = 1 - Math.min(1, p * 1.6);
+    var now = performance.now();
+    var gatherDone = !!gatherStart;
     for (var i = 0; i < cards.length; i++) {
       var c = cards[i];
+      var arrive = 1;
+      if (!gathered) {
+        arrive = poseCard(c, i, now);
+        if (arrive < 1) gatherDone = false;
+      }
       var zf = depthZ(c, sx, sy);
       var base = 0.14 + 0.86 * Math.pow((zf + 1) / 2, 0.85);
       var dim = shade * (1 - base);
@@ -1249,6 +1279,7 @@ body.lit #lit{
         dim = Math.min(1, dim + 0.78);
         if (i === focused) fade = 0;
       }
+      fade *= gatherStart ? Math.min(1, arrive / 0.28) : 0;
       if (Math.abs(fade - c.op) > 0.004) {
         c.op = fade;
         c.el.style.opacity = fade.toFixed(3);
@@ -1258,6 +1289,7 @@ body.lit #lit{
         c.el.style.setProperty('--d', dim.toFixed(3));
       }
     }
+    if (!gathered && gatherStart && gatherDone) gathered = true;
 
     cx += (tx - cx) * 0.2;
     cy += (ty - cy) * 0.2;
@@ -1278,13 +1310,21 @@ body.lit #lit{
     if (live) {
       var nx = tx < 0 ? 0.5 : Math.min(1, Math.max(0, tx / Math.max(1, window.innerWidth)));
       var ny = ty < 0 ? 0.5 : Math.min(1, Math.max(0, ty / Math.max(1, window.innerHeight)));
-      as = 1.28;
-      var w = rows.offsetWidth * as;
-      var h = rows.offsetHeight * as;
-      var travelX = Math.max(window.innerWidth * 0.08, (w - grid.clientWidth) / 2);
-      var travelY = Math.max(window.innerHeight * 0.08, (h - grid.clientHeight) / 2);
-      ax = (0.5 - nx) * travelX;
-      ay = (0.5 - ny) * travelY;
+      var ow = Math.max(1, rows.offsetWidth);
+      var oh = Math.max(1, rows.offsetHeight);
+      var cover = Math.max(window.innerWidth / ow, window.innerHeight / oh);
+      as = Math.max(1.85, cover * 1.22);
+      var centerX = rows.offsetLeft + ow / 2;
+      var centerY = rows.offsetTop + oh / 2;
+      var halfW = ow * as / 2;
+      var halfH = oh * as / 2;
+      var bleed = 36;
+      var tx0 = halfW - centerX - bleed;
+      var tx1 = window.innerWidth - centerX - halfW + bleed;
+      var ty0 = halfH - centerY - bleed;
+      var ty1 = window.innerHeight - centerY - halfH + bleed;
+      ax = tx0 + (tx1 - tx0) * nx;
+      ay = ty0 + (ty1 - ty0) * ny;
     } else if (open) {
       ax = gridX;
       ay = gridY;
@@ -1337,6 +1377,7 @@ body.lit #lit{
   var active = null;
   stage.addEventListener('pointerdown', function (e) {
     if (document.body.classList.contains('lit')) return;
+    if (gatherStart && !gathered) return;
     if (e.button !== undefined && e.button !== 0) return;
     active = {
       id: e.pointerId,
@@ -1693,6 +1734,8 @@ body.lit #lit{
     layout();
     requestAnimationFrame(function () { layout(); });
     setTimeout(function () {
+      gatherStart = performance.now();
+      if (reduceMotion) gathered = true;
       layout();
       document.body.classList.add('revealed');
       intro.classList.add('gone');
