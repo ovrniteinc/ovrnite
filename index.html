@@ -225,11 +225,14 @@ body.gridview #grid{
 }
 .plane.arriving figure{opacity:0}
 .rows{
+  --cell-gap:clamp(12px, 1.5vw, 22px);
   display:grid;
   grid-template-columns:repeat(3, 1fr);
-  gap:clamp(10px, 1.4vw, 20px);
+  gap:var(--cell-gap);
   width:100%;
   margin:0;
+  padding:calc(var(--cell-gap) / 2);
+  box-sizing:border-box;
 }
 .tile-copy{
   position:absolute;
@@ -991,7 +994,7 @@ body.lit #lit{
   #litTitle{font-size:clamp(20px, 5.6vw, 26px)}
   #litNote{font-size:12.5px;line-height:1.58}
   .shot button{top:8px;right:8px}
-  .rows{grid-template-columns:repeat(3, 1fr);gap:8px}
+  .rows{--cell-gap:10px;grid-template-columns:repeat(3, 1fr)}
   #grid figcaption{opacity:1;transform:none;font-size:13px}
 }
 @media (max-width:380px){
@@ -1429,12 +1432,10 @@ body.lit #lit{
     var r = el.getBoundingClientRect();
     var cx = r.left + r.width / 2;
     var cy = r.top + r.height / 2;
-    var w = r.width;
-    var h = r.height;
-    if (w < 48 || h < 32) {
-      w = Math.max(w, 110);
-      h = Math.max(h, 74);
-    }
+    var w = Math.max(r.width, 48);
+    var h = Math.max(r.height, 32);
+    if (w / h > 1.5) h = w / 1.5;
+    else w = h * 1.5;
     if (cx < -20 || cy < -20 || cx > window.innerWidth + 20 || cy > window.innerHeight + 20) {
       cx = Math.min(window.innerWidth + 24, Math.max(-24, cx));
       cy = Math.min(window.innerHeight + 24, Math.max(-24, cy));
@@ -1466,13 +1467,13 @@ body.lit #lit{
         flyer.style.top = a.top + 'px';
         flyer.style.width = a.width + 'px';
         flyer.style.height = a.height + 'px';
+        flyer.style.opacity = '.82';
         document.body.appendChild(flyer);
         gridFlights.push(flyer);
         var dx = (b.left + b.width / 2) - (a.left + a.width / 2);
         var dy = (b.top + b.height / 2) - (a.top + a.height / 2);
-        var sx = b.width / a.width;
-        var sy = b.height / a.height;
-        var tf = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx + ',' + sy + ')';
+        var s = b.width / a.width;
+        var tf = 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')';
         var delay = (i % 6) * 45;
         requestAnimationFrame(function () {
           requestAnimationFrame(function () {
@@ -1502,7 +1503,17 @@ body.lit #lit{
     plane.classList.add('arriving');
     applyPlane();
     var tos = [];
-    for (var i = 0; i < cards.length; i++) tos.push(rows.children[i].getBoundingClientRect());
+    for (var i = 0; i < cards.length; i++) {
+      var cell = rows.children[i].getBoundingClientRect();
+      var w = cell.width;
+      var h = w / 1.5;
+      tos.push({
+        left: cell.left + (cell.width - w) / 2,
+        top: cell.top + (cell.height - h) / 2,
+        width: w,
+        height: h
+      });
+    }
     if (reduceMotion) { plane.classList.remove('arriving'); return; }
     gridFlying = true;
     var ended = false;
