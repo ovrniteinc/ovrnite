@@ -80,6 +80,7 @@ html{
   scrollbar-gutter:stable;
   -webkit-text-size-adjust:100%;
   text-size-adjust:100%;
+  overscroll-behavior:none;
 }
 body{
   margin:0;
@@ -92,7 +93,7 @@ body{
   overflow-x:hidden;
   min-height:100vh;
   min-height:100dvh;
-  overscroll-behavior-y:none;
+  overscroll-behavior:none;
 }
 body.locked{
   overflow:hidden;
@@ -114,24 +115,21 @@ a{-webkit-tap-highlight-color:transparent}
 h1,h2,p,figure{margin:0}
 s{text-decoration:none}
 
-#scrolltrack{height:200vh;pointer-events:none}
+#scrolltrack{height:120vh;pointer-events:none}
 #page{
   position:relative;
   z-index:15;
-  background:#000;
+  background:transparent;
 }
 .story{
-  min-height:100vh;
-  min-height:100dvh;
-  display:flex;
-  align-items:center;
-  padding:clamp(72px, 12vh, 120px) clamp(28px, 8vw, 120px);
-  background:#000;
+  display:block;
+  padding:clamp(16vh, 22vh, 26vh) clamp(28px, 8vw, 120px) clamp(56px, 10vh, 96px);
+  background:transparent;
 }
 .story-inner{max-width:920px}
 .fade-in{
   opacity:var(--rise, 0);
-  transform:translateY(calc((1 - var(--rise, 0)) * 28px));
+  transform:translateY(calc((1 - var(--rise, 0)) * 14px));
 }
 .story-inner p{
   font-family:var(--sans);
@@ -141,12 +139,9 @@ s{text-decoration:none}
   letter-spacing:-.015em;
   color:#fff;
 }
-.story-inner p + p{margin-top:clamp(28px, 4.5vh, 52px)}
+.story-inner p + p{margin-top:clamp(16px, 2.4vh, 28px)}
 .story-inner p span{display:block}
-.story-inner p span.more{display:inline}
-.story-inner .more{
-  color:rgba(255,255,255,calc(.34 + .66 * var(--rise, 0)));
-}
+.story-inner .line + .line{margin-top:.22em}
 .close{
   min-height:100vh;
   min-height:100dvh;
@@ -230,9 +225,6 @@ s{text-decoration:none}
   user-select:none;
   -webkit-user-select:none;
   transition:opacity .6s var(--ease), filter .6s var(--ease);
-}
-@media (pointer:coarse){
-  #stage{touch-action:pan-y}
 }
 body.gridview #stage{
   opacity:0;
@@ -672,11 +664,29 @@ body.gridview .gridbtn{
 body.deep:not(.gridview) .gridbtn{
   opacity:calc(1 - var(--hero, 0));
 }
+.soundbtn{
+  position:fixed;
+  right:calc(var(--pad) + var(--safe-right) - 13px);
+  bottom:calc(var(--pad) + var(--safe-bottom) + 26px);
+  z-index:120;
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  pointer-events:auto;
+}
+.soundbtn svg{display:block}
+.soundbtn .sound-off{display:none}
+.soundbtn.is-off{color:rgba(255,255,255,.45)}
+.soundbtn.is-off .sound-on{display:none}
+.soundbtn.is-off .sound-off{display:block}
 body.revealed .colophon{opacity:calc(1 - var(--hero, 0))}
 body.hero-gone .gridbtn,
 body.hero-gone .bio,
 body.hero-gone .colophon,
-body.hero-gone .cue{
+body.hero-gone .cue,
+body.hero-gone .hand-hint{
   opacity:0;
   pointer-events:none;
 }
@@ -732,6 +742,30 @@ body.lit .cue{
   transition-delay:0s;
   transition-duration:.45s;
 }
+.hand-hint{
+  position:fixed;
+  left:50%;
+  bottom:calc(var(--pad) + var(--safe-bottom) + 28px);
+  transform:translateX(-50%);
+  z-index:54;
+  margin:0;
+  font-family:var(--sans);
+  font-size:12px;
+  font-weight:400;
+  letter-spacing:.04em;
+  color:rgba(244,242,239,.78);
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;
+  text-align:center;
+  transition:opacity .5s var(--ease);
+}
+.hand-hint .hand-back{display:none}
+body.hand-live .hand-hint{opacity:1}
+body.gridview .hand-hint .hand-open{display:none}
+body.gridview .hand-hint .hand-back{display:inline}
+body.menu-open .hand-hint,
+body.lit .hand-hint{opacity:0}
 @keyframes sweep{
   0%{transform:translateX(-100%)}
   55%{transform:translateX(0)}
@@ -922,7 +956,8 @@ body.lit .cue{
   transform:translateY(14px);
   transition:opacity .45s ease, transform .55s var(--ease);
 }
-#menu.open.reading .studio{opacity:1;pointer-events:auto;transform:none}
+#menu.open.reading .menu-list{opacity:0;pointer-events:none}
+#menu.open.reading .studio{display:flex;opacity:1;pointer-events:auto;transform:none}
 .studio-inner{width:min(640px, 100%);margin:0 auto}
 .studio-back{
   display:inline-flex;
@@ -1242,6 +1277,9 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 @media (hover:none), (pointer:coarse){
   #dot{display:none}
 }
+@media (hover:hover) and (pointer:fine){
+  html, body, body *{cursor:none !important}
+}
 
 @media (max-width:900px){
   .bio{max-width:min(420px, calc(100vw - var(--pad) * 2 - var(--safe-left) - var(--safe-right)))}
@@ -1257,6 +1295,10 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 }
 @media (max-width:768px){
   .colophon{display:none}
+  .soundbtn{
+    right:calc(var(--pad) + var(--safe-right));
+    bottom:calc(var(--pad) + var(--safe-bottom));
+  }
   .bio{max-width:calc(100vw - var(--pad) * 2 - var(--safe-left) - var(--safe-right))}
   #headline{font-size:clamp(22px, 6.4vw, 34px)}
   .orbit{transform:scale(.82)}
@@ -1277,7 +1319,6 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   #litTitle{font-size:clamp(28px, 8vw, 38px)}
   #litNote{font-size:14px;line-height:1.5}
   .rows{--cell-gap:10px;grid-template-columns:repeat(3, 1fr)}
-  .story-inner p span{display:inline}
   .story-inner p{font-size:clamp(22px, 5.4vw, 30px)}
   .close{padding-top:72px}
   .close-main{grid-template-columns:1fr;align-items:start}
@@ -1293,6 +1334,10 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 }
 @media (max-height:520px) and (orientation:landscape){
   .bio,.colophon,.cue{display:none}
+  .soundbtn{
+    right:calc(var(--pad) + var(--safe-right));
+    bottom:calc(var(--pad) + var(--safe-bottom));
+  }
   .orbit{transform:scale(.55);top:50%}
   #headline{font-size:clamp(18px, 4.8vh, 28px)}
   #lit{padding:calc(28px + var(--safe-top)) 18px calc(28px + var(--safe-bottom))}
@@ -1314,8 +1359,15 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 <main id="page">
   <section class="story" id="story">
     <div class="story-inner">
-      <p class="fade-in"><span>If you remember only one thing about us,</span> <span>it's Be Distinctive Everywhere.</span></p>
-      <p class="fade-in"><span>Since 1990, we've helped brands be who</span> <span>they are, only more so. <span class="more">Because as a brand moves, it has to stay unmistakable.</span></span></p>
+      <p>
+        <span class="fade-in line">If you remember only one thing about us,</span>
+        <span class="fade-in line">it's Be Distinctive Everywhere.</span>
+      </p>
+      <p>
+        <span class="fade-in line">Since 1990, we've helped brands be who</span>
+        <span class="fade-in line">they are, only more so.</span>
+        <span class="fade-in line">Because as a brand moves, it has to stay unmistakable.</span>
+      </p>
     </div>
   </section>
   <section class="close" id="close">
@@ -1323,16 +1375,17 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       <div class="close-words">
         <a class="fade-in" href="#places">Find</a>
         <a class="fade-in" href="#">Follow</a>
-        <a class="fade-in" href="mailto:studio@ethanvale.photo">Connect</a>
+        <a class="fade-in" href="mailto:ovrniteinc@gmail.com">Connect</a>
       </div>
       <div class="close-places" id="places">
         <div class="fade-in">
-          <h2>London</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt</p>
+          <h2>UK</h2>
         </div>
         <div class="fade-in">
-          <h2>UAE</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt</p>
+          <h2>USA</h2>
+        </div>
+        <div class="fade-in">
+          <h2>SA</h2>
         </div>
       </div>
     </div>
@@ -1366,15 +1419,25 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 <aside class="bio chrome">
   <p>A multidisciplinary design and development studio. The work covers brands, digital products and the experiences around them.</p>
 </aside>
-<div class="colophon chrome">United Kingdom · USA · Saudi Arabia</div>
+<div class="colophon chrome">UK, USA, SA</div>
 <button id="gridBtn" class="gridbtn" type="button" aria-label="Toggle grid view"><b></b><b></b><b></b><b></b></button>
+<button id="soundBtn" class="soundbtn" type="button" aria-label="Turn music off" aria-pressed="true">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+    <path d="M4 9.5v5h3.2L12 18.5v-13L7.2 9.5H4z"/>
+    <path class="sound-on" d="M15.2 9.2a3.6 3.6 0 0 1 0 5.6"/>
+    <path class="sound-on" d="M17.4 7a6.4 6.4 0 0 1 0 10"/>
+    <path class="sound-off" d="M16 9l5 6M21 9l-5 6"/>
+  </svg>
+</button>
+<audio id="bgm" loop preload="auto" src="music/theme.mp3"></audio>
 <div class="cue chrome"><s></s>Drag to rotate</div>
+<p id="handHint" class="hand-hint"><span class="hand-open">Make a fist, then open it to expand</span><span class="hand-back">Make a fist to return</span></p>
 <div id="menu" aria-hidden="true">
   <nav class="menu-list" aria-label="Menu">
-    <a href="#" style="--i:0">Work</a>
-    <a href="#" style="--i:1">Services</a>
-    <a href="#" style="--i:2">Thinking</a>
-    <a href="#" style="--i:3">Contact</a>
+    <a href="#work" data-studio="work" style="--i:0">Work</a>
+    <a href="#services" data-studio="services" style="--i:1">Services</a>
+    <a href="#thinking" data-studio="thinking" style="--i:2">Thinking</a>
+    <a href="#contact" data-studio="contact" style="--i:3">Contact</a>
   </nav>
   <div class="orbit">
     <div class="core"><img src="logo/logo.png" alt="OVRNITE"></div>
@@ -1532,6 +1595,13 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   var velX = 0;
   var velY = 0;
   var dragging = false;
+  var scrollVel = 0;
+  var scrollGlide = false;
+  var idleYaw = (Math.random() < 0.5 ? -1 : 1) * 0.05;
+  var idlePitch = (Math.random() < 0.5 ? -1 : 1) * 0.012;
+  var idleTargetYaw = idleYaw;
+  var idleTargetPitch = idlePitch;
+  var idleClock = 0;
   var focused = -1;
   var holdP = null;
   var savedScroll = 0;
@@ -1573,7 +1643,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     document.documentElement.style.setProperty('--persp', perspective + 'px');
     document.documentElement.style.setProperty('--cw', cw + 'px');
     var track = document.getElementById('scrolltrack');
-    if (track) track.style.height = (h * 2) + 'px';
+    if (track) track.style.height = Math.round(h * 1.2) + 'px';
     buildStars();
     var now = performance.now();
     for (var i = 0; i < cards.length; i++) poseCard(cards[i], i, now);
@@ -1604,17 +1674,61 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     }
     var rect = el.getBoundingClientRect();
     var view = window.innerHeight;
-    var span = Math.max(rect.height, 72);
+    var span = Math.max(rect.height, view * 0.28);
     var t = (view - rect.bottom + span) / span;
     if (t < 0) t = 0;
     else if (t > 1) t = 1;
-    el.style.setProperty('--rise', (1 - Math.pow(1 - t, 3)).toFixed(3));
+    var e = t * t * (3 - 2 * t);
+    el.style.setProperty('--rise', e.toFixed(3));
+  }
+  function riseLine(el) {
+    if (reduceMotion) {
+      el.style.setProperty('--rise', '1');
+      return;
+    }
+    var rect = el.getBoundingClientRect();
+    var view = window.innerHeight;
+    var start = view * 0.86;
+    var end = view * 0.46;
+    var t = (start - rect.top) / (start - end);
+    if (t < 0) t = 0;
+    else if (t > 1) t = 1;
+    var e = t * t * (3 - 2 * t);
+    el.style.setProperty('--rise', e.toFixed(3));
   }
 
   function clampPitch() {
     var s = tilt + dragY;
     if (s > 32) { dragY = 32 - tilt; velY = 0; }
     else if (s < -32) { dragY = -32 - tilt; velY = 0; }
+  }
+  function onGlobe(x, y, target) {
+    if (target && target.closest && target.closest('.card')) return true;
+    var cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 80;
+    var dx = x - window.innerWidth * 0.5;
+    var dy = y - window.innerHeight * 0.5;
+    return Math.hypot(dx, dy) <= R + cw * 0.55;
+  }
+  function idleDrift() {
+    if (reduceMotion || dragging || gridFlying) return;
+    if (document.body.classList.contains('gridview') || document.body.classList.contains('returning')) return;
+    if (document.body.classList.contains('lit') || document.body.classList.contains('menu-open')) return;
+    if (Math.abs(velX) > 0.012 || Math.abs(velY) > 0.012) return;
+    idleClock++;
+    if (idleClock > 280) {
+      idleClock = 0;
+      var dir = Math.random() * Math.PI * 2;
+      var speed = 0.032 + Math.random() * 0.038;
+      idleTargetYaw = Math.cos(dir) * speed;
+      idleTargetPitch = Math.sin(dir) * speed * 0.4;
+    }
+    var pitch = tilt + dragY;
+    if (pitch > 22) idleTargetPitch = -Math.abs(idleTargetPitch || 0.01);
+    else if (pitch < -22) idleTargetPitch = Math.abs(idleTargetPitch || 0.01);
+    idleYaw += (idleTargetYaw - idleYaw) * 0.012;
+    idlePitch += (idleTargetPitch - idlePitch) * 0.012;
+    dragX += idleYaw;
+    dragY += idlePitch;
   }
 
   function depthZ(c, sx, sy) {
@@ -1639,6 +1753,14 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   var dotOn = false;
 
   function step() {
+    if (scrollGlide && !dragging) {
+      window.scrollBy(0, scrollVel);
+      scrollVel *= 0.9;
+      if (Math.abs(scrollVel) < 0.35) {
+        scrollVel = 0;
+        scrollGlide = false;
+      }
+    }
     var litOpen = document.body.classList.contains('lit');
     if (!dragging && !litOpen && !gridFlying) {
       dragX += velX;
@@ -1648,6 +1770,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       if (Math.abs(velX) < 0.002) velX = 0;
       if (Math.abs(velY) < 0.002) velY = 0;
     }
+    idleDrift();
     clampPitch();
 
     var p = readP();
@@ -1665,7 +1788,10 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       stage.style.opacity = (1 - hero).toFixed(3);
       stage.style.pointerEvents = hero > 0.98 ? 'none' : '';
     }
-    for (var fi = 0; fi < fadeNodes.length; fi++) riseOf(fadeNodes[fi]);
+    for (var fi = 0; fi < fadeNodes.length; fi++) {
+      if (fadeNodes[fi].classList.contains('line')) riseLine(fadeNodes[fi]);
+      else riseOf(fadeNodes[fi]);
+    }
 
     var camZTarget = p * Math.min(64, R * 0.12);
     camZ += (camZTarget - camZ) * 0.075;
@@ -2191,6 +2317,8 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     if (document.body.classList.contains('lit')) return;
     if (gatherStart && !gathered) return;
     if (e.button !== undefined && e.button !== 0) return;
+    scrollGlide = false;
+    scrollVel = 0;
     active = {
       id: e.pointerId,
       x: e.clientX,
@@ -2200,6 +2328,8 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       card: e.target.closest ? e.target.closest('.card') : null,
       moved: 0,
       drag: e.pointerType !== 'touch',
+      scroll: false,
+      globe: e.pointerType !== 'touch' || onGlobe(e.clientX, e.clientY, e.target),
       type: e.pointerType
     };
     velX = 0;
@@ -2218,21 +2348,27 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     var tdx = e.clientX - active.x;
     var tdy = e.clientY - active.y;
     active.moved = Math.hypot(tdx, tdy);
-    if (active.type === 'touch' && !active.drag) {
-      if (active.moved < 10) return;
-      if (Math.abs(tdy) > Math.abs(tdx) * 1.15) {
-        active = null;
-        dragging = false;
+    if (active.type === 'touch' && !active.drag && !active.scroll) {
+      if (active.moved < 8) return;
+      if (active.globe) {
+        active.drag = true;
+        dragging = true;
+        dragX -= tdx * 0.13;
+        dragY -= tdy * 0.13;
+        velX = -dx * 0.13;
+        velY = -dy * 0.13;
+        clampPitch();
+        try { stage.setPointerCapture(e.pointerId); } catch (err) {}
         return;
       }
-      active.drag = true;
-      dragging = true;
-      dragX -= tdx * 0.13;
-      dragY -= tdy * 0.13;
-      velX = -dx * 0.13;
-      velY = -dy * 0.13;
-      clampPitch();
-      try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+      active.scroll = true;
+      window.scrollBy(0, -tdy);
+      scrollVel = -dy;
+      return;
+    }
+    if (active.scroll) {
+      window.scrollBy(0, -dy);
+      scrollVel = -dy;
       return;
     }
     if (!active.drag) return;
@@ -2242,13 +2378,21 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     velY = -dy * 0.13;
     clampPitch();
   });
+  stage.addEventListener('touchmove', function (e) {
+    if (active) e.preventDefault();
+  }, { passive: false });
   function endDrag(e, cancelled) {
     if (!active || e.pointerId !== active.id) return;
     var slop = window.matchMedia('(pointer: coarse)').matches ? 14 : 6;
     var card = active.card;
     var moved = active.moved;
+    var wasScroll = active.scroll;
     dragging = false;
     active = null;
+    if (wasScroll) {
+      if (Math.abs(scrollVel) > 0.5) scrollGlide = true;
+      return;
+    }
     if (!cancelled && card && moved <= slop) openShot(Number(card.dataset.idx), card);
   }
   stage.addEventListener('pointerup', function (e) { endDrag(e, false); });
@@ -2580,6 +2724,32 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   }, { passive: false });
 
   var STUDIO = {
+    work: {
+      kicker: 'Work',
+      title: 'The archive.',
+      body: [
+        'The pictures on the globe are the studio archive. Drag it, or open the grid and move through them one by one.',
+        'Each frame keeps its title and its note.'
+      ],
+      grid: true
+    },
+    services: {
+      kicker: 'Services',
+      title: 'What the studio takes on.',
+      body: [
+        'Identity and visual systems. Strategy and creative direction. Websites and digital experiences. Product design, development, motion and campaigns.',
+        'Strategy shapes the idea, design gives it character, and development turns it into something people can use.',
+        'The aim is work that stays coherent across every screen and touchpoint.'
+      ]
+    },
+    thinking: {
+      kicker: 'Thinking',
+      title: 'Be distinctive everywhere.',
+      body: [
+        'As a brand moves, it has to stay unmistakable. The name, the picture, the product and the site should still feel like one system.',
+        'The studio starts by looking. That same attention is what keeps a brand, a product and a screen from drifting apart.'
+      ]
+    },
     about: {
       kicker: '01  About',
       title: 'A studio for brands, products and experiences.',
@@ -2625,9 +2795,9 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       title: 'Start a conversation.',
       body: [
         'Ovrnite works with founders, teams and businesses, whether the brief is new or already in the world.',
-        'United Kingdom · USA · Saudi Arabia'
+        'UK, USA, SA'
       ],
-      mail: 'studio@ethanvale.photo'
+      mail: 'ovrniteinc@gmail.com'
     }
   };
   var studioKicker = document.getElementById('studioKicker');
@@ -2653,6 +2823,15 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       link.textContent = item.mail;
       mail.appendChild(link);
       studioBody.appendChild(mail);
+    }
+    if (item.grid) {
+      var go = document.createElement('p');
+      var open = document.createElement('a');
+      open.href = '#';
+      open.setAttribute('data-grid', '');
+      open.textContent = 'Open the grid';
+      go.appendChild(open);
+      studioBody.appendChild(go);
     }
     menu.classList.add('reading');
     if (studioPane) studioPane.scrollTop = 0;
@@ -2801,7 +2980,6 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     var a = e.target.closest ? e.target.closest('a') : null;
     if (!a || !menu.contains(a)) return;
     e.preventDefault();
-    if (a.closest('.menu-list')) return;
     var key = a.getAttribute('data-studio');
     if (key) { showStudio(key); return; }
     var toGrid = a.hasAttribute('data-grid');
@@ -3061,6 +3239,194 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       bump();
     });
   });
+
+  var bgm = document.getElementById('bgm');
+  var soundBtn = document.getElementById('soundBtn');
+  var musicOn = true;
+  bgm.volume = 0.42;
+  function paintSound() {
+    soundBtn.classList.toggle('is-off', !musicOn);
+    soundBtn.setAttribute('aria-pressed', musicOn ? 'true' : 'false');
+    soundBtn.setAttribute('aria-label', musicOn ? 'Turn music off' : 'Turn music on');
+  }
+  function tryMusic() {
+    if (!musicOn) return;
+    var pending = bgm.play();
+    if (pending && pending.catch) pending.catch(function () {});
+  }
+  tryMusic();
+  document.addEventListener('pointerdown', tryMusic);
+  document.addEventListener('keydown', tryMusic);
+  soundBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  soundBtn.addEventListener('click', function () {
+    musicOn = !musicOn;
+    if (musicOn) tryMusic();
+    else bgm.pause();
+    paintSound();
+  });
+
+  function startHandGrid() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    var video = document.createElement('video');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('aria-hidden', 'true');
+    video.muted = true;
+    video.autoplay = true;
+    video.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none';
+    document.body.appendChild(video);
+    var handStream = null;
+    navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 240 }, frameRate: { ideal: 12, max: 15 } }
+    }).then(function (stream) {
+      handStream = stream;
+      video.srcObject = stream;
+      return video.play().catch(function () {});
+    }).then(function () {
+      document.body.classList.add('hand-live');
+      function begin() { loadHandModel(video, handStream); }
+      if (document.body.classList.contains('revealed')) setTimeout(begin, 600);
+      else {
+        var wait = setInterval(function () {
+          if (!document.body.classList.contains('revealed')) return;
+          clearInterval(wait);
+          setTimeout(begin, 700);
+        }, 250);
+      }
+    }).catch(function () {});
+  }
+  function loadHandModel(video, stream) {
+    import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0').then(function (mp) {
+      return mp.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm').then(function (vision) {
+        function make(delegate) {
+          return mp.HandLandmarker.createFromOptions(vision, {
+            baseOptions: {
+              modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+              delegate: delegate
+            },
+            runningMode: 'VIDEO',
+            numHands: 1
+          });
+        }
+        return make('GPU').catch(function () { return make('CPU'); });
+      });
+    }).then(function (landmarker) {
+      watchHand(video, stream, landmarker);
+    }).catch(function () {
+      document.body.classList.remove('hand-live');
+      stream.getTracks().forEach(function (track) { track.stop(); });
+    });
+  }
+  function handSpread(lm) {
+    var close = 0;
+    var far = 0;
+    var tips = [8, 12, 16, 20];
+    for (var i = 0; i < tips.length; i++) {
+      var d = Math.hypot(lm[tips[i]].x - lm[0].x, lm[tips[i]].y - lm[0].y);
+      if (d < 0.2) close++;
+      if (d > 0.34) far++;
+    }
+    if (close >= 3) return 'fist';
+    if (far >= 3) return 'open';
+    return 'mid';
+  }
+  function gridGestureReady() {
+    if (!document.body.classList.contains('revealed')) return false;
+    if (gridFlying || document.body.classList.contains('returning')) return false;
+    if (document.body.classList.contains('lit') || document.body.classList.contains('menu-open')) return false;
+    if (!document.body.classList.contains('gridview') && window.scrollY > window.innerHeight * 0.25) return false;
+    return true;
+  }
+  function watchHand(video, stream, landmarker) {
+    var fistStreak = 0;
+    var openStreak = 0;
+    var armed = false;
+    var needRelease = false;
+    var coolUntil = 0;
+    var busy = false;
+    function resetPose() {
+      fistStreak = 0;
+      openStreak = 0;
+      armed = false;
+    }
+    function cam(on) {
+      var tracks = stream.getVideoTracks();
+      for (var i = 0; i < tracks.length; i++) {
+        if (tracks[i].enabled !== on) tracks[i].enabled = on;
+      }
+    }
+    function later(ms) {
+      setTimeout(stepDetect, ms);
+    }
+    function stepDetect() {
+      if (document.hidden) {
+        cam(false);
+        resetPose();
+        later(600);
+        return;
+      }
+      cam(true);
+      if (busy || video.readyState < 2 || !gridGestureReady() || performance.now() < coolUntil) {
+        if (!gridGestureReady() || performance.now() < coolUntil) resetPose();
+        later(260);
+        return;
+      }
+      busy = true;
+      var t0 = performance.now();
+      var results = null;
+      try { results = landmarker.detectForVideo(video, t0); }
+      catch (err) { busy = false; later(420); return; }
+      busy = false;
+      var spent = performance.now() - t0;
+      readPose(results);
+      later(spent > 20 ? 380 : 180);
+    }
+    function readPose(results) {
+      var lm = results && results.landmarks && results.landmarks[0];
+      if (!lm) {
+        fistStreak = 0;
+        openStreak = 0;
+        return;
+      }
+      var pose = handSpread(lm);
+      var inGrid = document.body.classList.contains('gridview');
+      if (needRelease) {
+        if (pose === 'open') needRelease = false;
+        resetPose();
+        return;
+      }
+      if (inGrid) {
+        if (pose === 'fist') {
+          fistStreak++;
+          if (fistStreak >= 3) {
+            resetPose();
+            needRelease = true;
+            coolUntil = performance.now() + 2200;
+            leaveGrid();
+          }
+        } else fistStreak = 0;
+        return;
+      }
+      if (pose === 'fist') {
+        openStreak = 0;
+        fistStreak++;
+        if (fistStreak >= 3) armed = true;
+        return;
+      }
+      if (armed && pose === 'open') {
+        openStreak++;
+        if (openStreak >= 2) {
+          resetPose();
+          coolUntil = performance.now() + 2200;
+          enterGrid();
+        }
+        return;
+      }
+      openStreak = 0;
+    }
+    later(200);
+  }
+  startHandGrid();
 })();
 </script>
 </body>
