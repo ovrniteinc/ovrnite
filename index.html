@@ -283,6 +283,17 @@ body.revealed #headline .inner span{
   transform:none;
   filter:blur(0);
 }
+#headline .core{
+  position:absolute;
+  left:50%;
+  top:0;
+  width:clamp(64px, 8vw, 96px);
+  height:clamp(64px, 8vw, 96px);
+  margin-left:calc(clamp(64px, 8vw, 96px) / -2);
+  margin-top:calc(clamp(64px, 8vw, 96px) / -2);
+  border-radius:50%;
+  background:#fff;
+}
 
 .card{
   position:absolute;
@@ -1299,7 +1310,20 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     right:calc(var(--pad) + var(--safe-right));
     bottom:calc(var(--pad) + var(--safe-bottom));
   }
-  .bio{max-width:calc(100vw - var(--pad) * 2 - var(--safe-left) - var(--safe-right))}
+  .bio{
+    max-width:calc(100vw - var(--pad) * 2 - var(--safe-left) - var(--safe-right) - 56px);
+  }
+  .hand-hint{
+    bottom:calc(var(--pad) + var(--safe-bottom) + 72px);
+    width:min(260px, calc(100vw - 36px));
+    white-space:normal;
+    line-height:1.35;
+  }
+  .lit-nav.next{
+    right:calc(var(--pad) + var(--safe-right) + 60px);
+    bottom:calc(var(--pad) + var(--safe-bottom));
+  }
+  .lit-nav.prev{bottom:calc(var(--pad) + var(--safe-bottom))}
   #headline{font-size:clamp(22px, 6.4vw, 34px)}
   .orbit{transform:scale(.82)}
 }
@@ -1402,7 +1426,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 <div id="stage">
   <div id="world">
     <div id="orb"></div>
-    <h1 id="headline"><span class="inner"><span style="--i:0">hello.</span></span></h1>
+    <h1 id="headline" aria-label="OVRNITE"><span class="inner"><span class="core" style="--i:0"></span></span></h1>
   </div>
 </div>
 <div class="vig"></div>
