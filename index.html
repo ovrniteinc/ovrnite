@@ -142,10 +142,10 @@ s{text-decoration:none}
   clip-path:none;
 }
 .story-inner .word{
-  display:inline-block;
+  display:inline;
+}
+.story-inner .letter{
   opacity:var(--rise, 0);
-  transform:translateY(calc((1 - var(--rise, 0)) * .4em));
-  clip-path:inset(calc((1 - var(--rise, 0)) * 115%) 0 -0.14em 0);
 }
 .story-inner p{
   font-family:var(--sans);
@@ -1837,7 +1837,7 @@ body.lit .meta{
     return Math.min(1, Math.max(0, y / dist));
   }
 
-  var storyWords = [];
+  var storyLetters = [];
   var storyLines = document.querySelectorAll('#story .line');
   for (var si = 0; si < storyLines.length; si++) {
     var bits = storyLines[si].textContent.trim().split(/\s+/);
@@ -1846,9 +1846,15 @@ body.lit .meta{
     for (var wi = 0; wi < bits.length; wi++) {
       var word = document.createElement('span');
       word.className = 'word';
-      word.textContent = bits[wi];
-      word.dataset.i = String(storyWords.length);
-      storyWords.push(word);
+      var chars = bits[wi].split('');
+      for (var ci = 0; ci < chars.length; ci++) {
+        var letter = document.createElement('span');
+        letter.className = 'letter';
+        letter.textContent = chars[ci];
+        letter.dataset.i = String(storyLetters.length);
+        storyLetters.push(letter);
+        word.appendChild(letter);
+      }
       storyLines[si].appendChild(word);
       if (wi < bits.length - 1) storyLines[si].appendChild(document.createTextNode(' '));
     }
@@ -1868,7 +1874,7 @@ body.lit .meta{
     var e = t * t * (3 - 2 * t);
     el.style.setProperty('--rise', e.toFixed(3));
   }
-  function riseWord(el) {
+  function riseLetter(el) {
     if (reduceMotion) {
       el.style.setProperty('--rise', '1');
       return;
@@ -1876,16 +1882,15 @@ body.lit .meta{
     var block = el.closest('.story-inner') || el;
     var rect = block.getBoundingClientRect();
     var view = window.innerHeight;
-    var n = Math.max(1, storyWords.length);
+    var n = Math.max(1, storyLetters.length);
     var idx = Number(el.dataset.i) || 0;
     var start = view * 0.86;
     var end = view * 0.06;
     var t = (start - rect.top) / (start - end);
-    var local = t * n - idx;
+    var local = (t * n - idx) / 7;
     if (local < 0) local = 0;
     else if (local > 1) local = 1;
-    var e = local * local * (3 - 2 * local);
-    el.style.setProperty('--rise', e.toFixed(3));
+    el.style.setProperty('--rise', local.toFixed(3));
   }
 
   function onGlobe(x, y, target) {
@@ -1971,7 +1976,7 @@ body.lit .meta{
       stage.style.pointerEvents = hero > 0.98 ? 'none' : '';
     }
     for (var fi = 0; fi < fadeNodes.length; fi++) riseOf(fadeNodes[fi]);
-    for (var sw = 0; sw < storyWords.length; sw++) riseWord(storyWords[sw]);
+    for (var sw = 0; sw < storyLetters.length; sw++) riseLetter(storyLetters[sw]);
 
     var camZTarget = p * Math.min(64, R * 0.12);
     camZ += (camZTarget - camZ) * 0.075;
