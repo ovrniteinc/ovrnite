@@ -1317,7 +1317,8 @@ body.lit .meta{
   inset:0;
   width:100%;
   height:100%;
-  object-fit:contain;
+  object-fit:cover;
+  object-position:center;
   background:#000;
 }
 .veil{
@@ -1699,7 +1700,7 @@ body.lit .meta{
   var litNote = document.getElementById('litNote');
   var intro = document.getElementById('intro');
   var video = document.getElementById('film');
-  video.src = window.innerWidth <= 640
+  video.src = window.innerHeight > window.innerWidth
     ? 'video/ovrnite-logo%20intro.resize%20verticle.mp4'
     : 'video/ovrnite-logo%20intro.resize.mp4';
   var splash = document.getElementById('splash');
@@ -1887,11 +1888,6 @@ body.lit .meta{
     el.style.setProperty('--rise', e.toFixed(3));
   }
 
-  function clampPitch() {
-    var s = tilt + dragY;
-    if (s > 32) { dragY = 32 - tilt; velY = 0; }
-    else if (s < -32) { dragY = -32 - tilt; velY = 0; }
-  }
   function onGlobe(x, y, target) {
     if (target && target.closest && target.closest('.card')) return true;
     var cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 80;
@@ -1912,9 +1908,6 @@ body.lit .meta{
       idleTargetYaw = Math.cos(dir) * speed;
       idleTargetPitch = Math.sin(dir) * speed * 0.4;
     }
-    var pitch = tilt + dragY;
-    if (pitch > 22) idleTargetPitch = -Math.abs(idleTargetPitch || 0.01);
-    else if (pitch < -22) idleTargetPitch = Math.abs(idleTargetPitch || 0.01);
     idleYaw += (idleTargetYaw - idleYaw) * 0.012;
     idlePitch += (idleTargetPitch - idlePitch) * 0.012;
     dragX += idleYaw;
@@ -1961,7 +1954,6 @@ body.lit .meta{
       if (Math.abs(velY) < 0.002) velY = 0;
     }
     idleDrift();
-    clampPitch();
 
     var p = readP();
     document.body.classList.toggle('deep', p > 0.08);
@@ -2552,7 +2544,6 @@ body.lit .meta{
         dragY += tdy * 0.13;
         velX = dx * 0.13;
         velY = dy * 0.13;
-        clampPitch();
         try { stage.setPointerCapture(e.pointerId); } catch (err) {}
         return;
       }
@@ -2571,7 +2562,6 @@ body.lit .meta{
     dragY += dy * 0.13;
     velX = dx * 0.13;
     velY = dy * 0.13;
-    clampPitch();
   });
   stage.addEventListener('touchmove', function (e) {
     if (active) e.preventDefault();
