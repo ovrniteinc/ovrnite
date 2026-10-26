@@ -122,26 +122,43 @@ s{text-decoration:none}
   background:transparent;
 }
 .story{
-  display:block;
-  padding:clamp(16vh, 22vh, 26vh) clamp(28px, 8vw, 120px) clamp(56px, 10vh, 96px);
+  min-height:140vh;
+  min-height:140dvh;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  padding:clamp(72px, 12vh, 140px) clamp(40px, 8vw, 120px);
   background:transparent;
+  text-align:left;
 }
-.story-inner{max-width:920px}
+.story-inner{max-width:none;width:100%}
 .fade-in{
   opacity:var(--rise, 0);
   transform:translateY(calc((1 - var(--rise, 0)) * 14px));
 }
+.story-inner .line{
+  opacity:1;
+  transform:none;
+  clip-path:none;
+}
+.story-inner .word{
+  display:inline-block;
+  opacity:var(--rise, 0);
+  transform:translateY(calc((1 - var(--rise, 0)) * .4em));
+  clip-path:inset(calc((1 - var(--rise, 0)) * 115%) 0 -0.14em 0);
+}
 .story-inner p{
   font-family:var(--sans);
   font-weight:400;
-  font-size:clamp(26px, 3.05vw, 42px);
-  line-height:1.28;
-  letter-spacing:-.015em;
+  font-size:clamp(34px, 4.7vw, 68px);
+  line-height:1.18;
+  letter-spacing:-.03em;
   color:#fff;
+  text-align:left;
 }
-.story-inner p + p{margin-top:clamp(16px, 2.4vh, 28px)}
-.story-inner p span{display:block}
-.story-inner .line + .line{margin-top:.22em}
+.story-inner p + p{margin-top:clamp(22px, 3.2vh, 40px)}
+.story-inner .line{display:block}
+.story-inner .line + .line{margin-top:.16em}
 .close{
   min-height:100vh;
   min-height:100dvh;
@@ -177,19 +194,25 @@ s{text-decoration:none}
 .close-words a:focus-visible{color:#fff}
 .close-places h2{
   font-family:var(--sans);
-  font-weight:400;
-  font-size:clamp(18px, 1.5vw, 22px);
-  letter-spacing:-.01em;
+  font-weight:500;
+  font-size:clamp(20px, 1.6vw, 26px);
+  letter-spacing:-.02em;
   color:#fff;
 }
 .close-places p{
-  margin-top:10px;
-  max-width:230px;
-  font-size:14px;
+  margin-top:14px;
+  max-width:250px;
+  font-size:15px;
   line-height:1.45;
   color:#8d8d8d;
 }
-.close-places div + div{margin-top:clamp(28px, 4vh, 42px)}
+.close-places .phone{margin-top:16px}
+.close-places a{
+  color:inherit;
+  text-decoration:none;
+}
+.close-places a:hover{color:#fff}
+.close-places div + div{margin-top:clamp(36px, 5vh, 56px)}
 .legal{
   display:flex;
   justify-content:space-between;
@@ -293,6 +316,41 @@ body.revealed #headline .inner span{
   margin-top:calc(clamp(64px, 8vw, 96px) / -2);
   border-radius:50%;
   background:#fff;
+  pointer-events:auto;
+  cursor:pointer;
+  box-shadow:0 0 16px 6px rgba(255,255,255,.42), 0 0 32px 12px rgba(255,255,255,.16);
+  animation:coreBreath 8s ease-in-out infinite;
+}
+body.revealed #headline .core{transition:transform .45s ease}
+body.revealed #headline .core:hover{transform:scale(1.12)}
+#headline .core::before{
+  content:"";
+  position:absolute;
+  inset:-18%;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.22) 0%, rgba(255,255,255,.06) 48%, rgba(255,255,255,0) 70%);
+  pointer-events:none;
+  opacity:.5;
+  animation:coreWave 8s ease-in-out infinite;
+}
+body.invert #headline .core{
+  box-shadow:0 0 16px 6px rgba(0,0,0,.28), 0 0 32px 12px rgba(0,0,0,.12);
+  animation-name:coreBreathDark;
+}
+body.invert #headline .core::before{
+  background:radial-gradient(circle, rgba(0,0,0,.2) 0%, rgba(0,0,0,.06) 48%, rgba(0,0,0,0) 70%);
+}
+@keyframes coreBreath{
+  0%,100%{box-shadow:0 0 14px 5px rgba(255,255,255,.36), 0 0 28px 10px rgba(255,255,255,.14)}
+  50%{box-shadow:0 0 18px 7px rgba(255,255,255,.48), 0 0 36px 14px rgba(255,255,255,.2)}
+}
+@keyframes coreBreathDark{
+  0%,100%{box-shadow:0 0 14px 5px rgba(0,0,0,.24), 0 0 28px 10px rgba(0,0,0,.1)}
+  50%{box-shadow:0 0 18px 7px rgba(0,0,0,.32), 0 0 36px 14px rgba(0,0,0,.14)}
+}
+@keyframes coreWave{
+  0%,100%{transform:scale(1);opacity:.42}
+  50%{transform:scale(1.06);opacity:.58}
 }
 
 .card{
@@ -469,7 +527,7 @@ header.chrome{
   width:100%;
   z-index:60;
   display:flex;
-  justify-content:space-between;
+  justify-content:flex-end;
   align-items:flex-start;
   padding:calc(var(--pad) * .8 + var(--safe-top)) calc(var(--pad) + var(--safe-right)) calc(var(--pad) * .35) calc(var(--pad) + var(--safe-left));
   pointer-events:none;
@@ -481,17 +539,51 @@ body.menu-open header.chrome{
   transform:none;
 }
 body.lit header.chrome{z-index:100}
+.homebtn{
+  display:none;
+  position:fixed;
+  top:calc(var(--pad) * .8 + var(--safe-top));
+  left:calc(var(--pad) + var(--safe-left));
+  z-index:220;
+  width:44px;
+  height:44px;
+  align-items:center;
+  justify-content:flex-start;
+  color:#fff;
+  pointer-events:auto;
+}
+body.lit .homebtn{display:flex}
+.homebtn svg{display:block}
+body.invert .homebtn{color:#111}
 body.lit .menu-hint{display:none}
-#lit{filter:invert(0);transition:filter .55s var(--ease)}
-body.lit.invert #lit,
-body.lit.invert .slide-stage,
-body.lit.invert .shot-fly{filter:invert(1)}
-body.lit.invert .wordmark{mix-blend-mode:normal}
-body.lit.invert .wordmark .wm-on-dark{display:none}
-body.lit.invert .wordmark .wm-on-light{display:block}
-body.lit.invert .menu-mark{background:#111}
+html:has(body.invert),
+body.invert{background:#fff}
+body.invert #page,
+body.invert #sky,
+body.invert .vig,
+body.invert #grid,
+body.invert .bio,
+body.invert .gridbtn,
+body.invert .hand-hint,
+body.invert #menu,
+body.invert #lit,
+body.invert .shot-fly,
+body.invert .slide-stage img{
+  filter:invert(1);
+}
+body.invert .card img{filter:invert(1)}
+body.invert #headline .core{background:#111}
+body.invert .wordmark{mix-blend-mode:normal}
+body.invert .wordmark .wm-on-dark{display:none}
+body.invert .wordmark .wm-on-light{display:block}
+body.invert .menu-label,
+body.invert.menu-open .menu-label{color:#111}
+body.invert .soundbtn{color:#111}
+body.invert .soundbtn.is-off{color:rgba(17,17,17,.45)}
+body.invert .invert-dot,
+body.invert .menu-mark{background:#111}
 .wordmark{
-  display:flex;
+  display:none;
   align-items:center;
   line-height:0;
   text-decoration:none;
@@ -507,14 +599,21 @@ body.lit.invert .menu-mark{background:#111}
 body.menu-open .wordmark{mix-blend-mode:normal}
 .mark em{font-style:normal}
 .menu-btn{
+  position:relative;
   display:flex;
   align-items:center;
   justify-content:flex-end;
   gap:12px;
   min-width:var(--tap);
-  min-height:var(--tap);
+  height:clamp(20px, 2.15vw, 28px);
+  margin-top:-2px;
   padding:0;
   pointer-events:auto;
+}
+.menu-btn::after{
+  content:"";
+  position:absolute;
+  inset:-12px -8px;
 }
 .menu-hint{
   font-family:var(--sans);
@@ -536,6 +635,7 @@ body.menu-open .menu-hint{display:none}
 .menu-mark{
   width:18px;
   height:18px;
+  margin-top:-5px;
   border-radius:50%;
   background:#fff;
   display:block;
@@ -553,10 +653,12 @@ body.logo-away .menu-mark{visibility:hidden}
   transform-origin:center center;
 }
 #menu.logo-fly .core{opacity:0 !important;transition:none !important}
-.menu-btn .menu-label,
-.menu-btn .bars{display:none}
+.menu-btn .bars,
+.menu-hint{display:none}
 .menu-label{
+  display:block;
   font-size:clamp(14px, 1.2vw, 16px);
+  line-height:1;
   letter-spacing:.01em;
   color:#fff;
   transition:opacity .35s ease, color .35s ease;
@@ -648,9 +750,26 @@ body.lit .colophon{
   transition-duration:.45s;
 }
 
-.gridbtn{
+.invert-dot{
   position:fixed;
   left:calc(var(--pad) + var(--safe-left));
+  bottom:calc(var(--pad) + var(--safe-bottom));
+  z-index:120;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#fff;
+  pointer-events:auto;
+  transition:background .55s var(--ease);
+}
+.invert-dot::after{
+  content:"";
+  position:absolute;
+  inset:-14px;
+}
+.gridbtn{
+  position:fixed;
+  left:calc(var(--pad) + var(--safe-left) + 36px);
   bottom:calc(var(--pad) + var(--safe-bottom));
   z-index:56;
   width:44px;
@@ -675,11 +794,15 @@ body.gridview .gridbtn{
 body.deep:not(.gridview) .gridbtn{
   opacity:calc(1 - var(--hero, 0));
 }
-.soundbtn{
+.sound{
   position:fixed;
-  right:calc(var(--pad) + var(--safe-right) - 13px);
-  bottom:calc(var(--pad) + var(--safe-bottom) + 26px);
+  right:calc(var(--pad) + var(--safe-right));
+  bottom:calc(var(--pad) + var(--safe-bottom) - 13px);
   z-index:120;
+  width:44px;
+  height:44px;
+}
+.soundbtn{
   width:44px;
   height:44px;
   display:grid;
@@ -692,6 +815,50 @@ body.deep:not(.gridview) .gridbtn{
 .soundbtn.is-off{color:rgba(255,255,255,.45)}
 .soundbtn.is-off .sound-on{display:none}
 .soundbtn.is-off .sound-off{display:block}
+.vol{
+  position:absolute;
+  right:calc(100% - 8px);
+  top:50%;
+  width:128px;
+  height:28px;
+  margin:0;
+  padding:0 14px 0 12px;
+  display:flex;
+  align-items:center;
+  border-radius:999px;
+  background:rgba(0,0,0,.62);
+  opacity:0;
+  transform:translateY(-50%) translateX(8px);
+  pointer-events:none;
+  transition:opacity .2s ease, transform .2s ease;
+}
+.sound:hover .vol,
+.sound:focus-within .vol{
+  opacity:1;
+  transform:translateY(-50%);
+  pointer-events:auto;
+}
+.sound:has(.soundbtn.is-off) .vol{
+  opacity:0;
+  transform:translateY(-50%) translateX(8px);
+  pointer-events:none;
+}
+.vol input{
+  width:100%;
+  height:16px;
+  margin:0;
+  accent-color:#fff;
+  cursor:pointer;
+}
+body.invert .vol{background:rgba(255,255,255,.78)}
+body.invert .vol input{accent-color:#111}
+@media (hover:none){
+  .sound:not(:has(.soundbtn.is-off)) .vol{
+    opacity:1;
+    transform:translateY(-50%);
+    pointer-events:auto;
+  }
+}
 body.revealed .colophon{opacity:calc(1 - var(--hero, 0))}
 body.hero-gone .gridbtn,
 body.hero-gone .bio,
@@ -819,8 +986,8 @@ body.lit .hand-hint{opacity:0}
   display:block;
   font-family:var(--sans);
   font-weight:400;
-  font-size:clamp(28px, 3vw, 40px);
-  line-height:1.2;
+  font-size:clamp(72px, 9vw, 128px);
+  line-height:1.02;
   letter-spacing:-.02em;
   color:#fff;
   text-decoration:none;
@@ -1023,6 +1190,10 @@ body.lit #lit{
   pointer-events:auto;
   visibility:visible;
 }
+body.lit #stage{
+  opacity:0;
+  pointer-events:none;
+}
 #lit.closing{
   visibility:visible;
   pointer-events:none;
@@ -1034,7 +1205,7 @@ body.lit #lit{
   opacity:0;
   transition:opacity .55s var(--ease);
 }
-body.lit .scrim{opacity:1}
+body.lit .scrim{opacity:1;background:rgba(0,0,0,.46)}
 #lit.closing .scrim{opacity:0;transition:opacity .5s var(--ease)}
 .shot-fly{
   position:fixed;
@@ -1087,6 +1258,7 @@ body.lit .shot{opacity:1;transition-delay:.42s}
 }
 .meta{
   border:1px solid rgba(255,255,255,.42);
+  background:#000;
   display:flex;
   flex-direction:column;
   min-width:0;
@@ -1128,23 +1300,7 @@ body.lit .meta{
   line-height:1.3;
   color:rgba(255,255,255,.62);
 }
-.lit-nav{
-  position:absolute;
-  bottom:calc(18px + var(--safe-bottom));
-  z-index:2;
-  width:44px;
-  height:44px;
-  display:grid;
-  place-items:center;
-  color:#fff;
-  opacity:0;
-}
-body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
-#lit.closing .lit-nav{opacity:0;transition:opacity .25s ease}
-.lit-nav svg{display:block}
-.lit-nav.prev{left:calc(18px + var(--safe-left))}
-.lit-nav.next{right:calc(18px + var(--safe-right))}
-.lit-nav:hover{color:rgba(255,255,255,.6)}
+.lit-nav{display:none}
 
 #intro{
   position:fixed;
@@ -1161,9 +1317,8 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   inset:0;
   width:100%;
   height:100%;
-  object-fit:cover;
-  filter:grayscale(1);
-  -webkit-filter:grayscale(1);
+  object-fit:contain;
+  background:#000;
 }
 .veil{
   position:absolute;
@@ -1214,7 +1369,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 #splash{
   position:fixed;
   inset:0;
-  z-index:250;
+  z-index:160;
   background:#000;
   display:grid;
   place-items:center;
@@ -1306,12 +1461,8 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 }
 @media (max-width:768px){
   .colophon{display:none}
-  .soundbtn{
-    right:calc(var(--pad) + var(--safe-right));
-    bottom:calc(var(--pad) + var(--safe-bottom));
-  }
   .bio{
-    max-width:calc(100vw - var(--pad) * 2 - var(--safe-left) - var(--safe-right) - 56px);
+    max-width:calc(100vw - var(--pad) * 2 - var(--safe-left) - var(--safe-right) - 96px);
   }
   .hand-hint{
     bottom:calc(var(--pad) + var(--safe-bottom) + 72px);
@@ -1319,11 +1470,6 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     white-space:normal;
     line-height:1.35;
   }
-  .lit-nav.next{
-    right:calc(var(--pad) + var(--safe-right) + 60px);
-    bottom:calc(var(--pad) + var(--safe-bottom));
-  }
-  .lit-nav.prev{bottom:calc(var(--pad) + var(--safe-bottom))}
   #headline{font-size:clamp(22px, 6.4vw, 34px)}
   .orbit{transform:scale(.82)}
 }
@@ -1358,10 +1504,6 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 }
 @media (max-height:520px) and (orientation:landscape){
   .bio,.colophon,.cue{display:none}
-  .soundbtn{
-    right:calc(var(--pad) + var(--safe-right));
-    bottom:calc(var(--pad) + var(--safe-bottom));
-  }
   .orbit{transform:scale(.55);top:50%}
   #headline{font-size:clamp(18px, 4.8vh, 28px)}
   #lit{padding:calc(28px + var(--safe-top)) 18px calc(28px + var(--safe-bottom))}
@@ -1388,7 +1530,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
         <span class="fade-in line">it's Be Distinctive Everywhere.</span>
       </p>
       <p>
-        <span class="fade-in line">Since 1990, we've helped brands be who</span>
+        <span class="fade-in line">Since 2026, we've helped brands be who</span>
         <span class="fade-in line">they are, only more so.</span>
         <span class="fade-in line">Because as a brand moves, it has to stay unmistakable.</span>
       </p>
@@ -1403,13 +1545,14 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       </div>
       <div class="close-places" id="places">
         <div class="fade-in">
-          <h2>UK</h2>
+          <h2>London</h2>
+          <p>Tea Building, 56 Shoreditch High Street, London, E1 6JJ</p>
+          <p class="phone"><a href="tel:+442074288000">+44 (0) 20 7428 8000</a></p>
         </div>
         <div class="fade-in">
-          <h2>USA</h2>
-        </div>
-        <div class="fade-in">
-          <h2>SA</h2>
+          <h2>New York</h2>
+          <p>85 Spring Street, 5th Floor, New York, NY 10012</p>
+          <p class="phone"><a href="tel:+13472058200">+1 347 205 8200</a></p>
         </div>
       </div>
     </div>
@@ -1434,27 +1577,25 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 <header class="chrome">
   <a class="wordmark" href="#" aria-label="OVRNITE"><img class="wm-on-dark" src="logo/Logo%20and%20Typeface_Ovr-Typeface%20logo%20-%20White.png" alt=""><img class="wm-on-light" src="logo/Logo%20and%20Typeface_Ovr-Typeface%20logo%20-%20Black.png" alt=""></a>
   <button id="menuBtn" class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
-    <span class="menu-hint">Menu</span>
-    <span class="menu-mark"></span>
-    <span class="menu-label"><span class="when-open">Close</span></span>
-    <span class="bars"><i></i><i></i></span>
+    <span class="menu-label"><span class="when-closed">Menu</span><span class="when-open">Close</span></span>
   </button>
 </header>
-<aside class="bio chrome">
-  <p>A multidisciplinary design and development studio. The work covers brands, digital products and the experiences around them.</p>
-</aside>
-<div class="colophon chrome">UK, USA, SA</div>
-<button id="gridBtn" class="gridbtn" type="button" aria-label="Toggle grid view"><b></b><b></b><b></b><b></b></button>
-<button id="soundBtn" class="soundbtn" type="button" aria-label="Turn music off" aria-pressed="true">
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-    <path d="M4 9.5v5h3.2L12 18.5v-13L7.2 9.5H4z"/>
-    <path class="sound-on" d="M15.2 9.2a3.6 3.6 0 0 1 0 5.6"/>
-    <path class="sound-on" d="M17.4 7a6.4 6.4 0 0 1 0 10"/>
-    <path class="sound-off" d="M16 9l5 6M21 9l-5 6"/>
-  </svg>
+<button id="homeBtn" class="homebtn" type="button" aria-label="Back to home">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 11.5L12 5l8 6.5V20H4v-8.5z"/><path d="M10 20v-6h4v6"/></svg>
 </button>
+<button id="invertBtn" class="invert-dot" type="button" aria-pressed="false" aria-label="Invert colors"></button>
+<div class="sound">
+  <label class="vol"><input id="vol" type="range" min="0" max="100" value="42" aria-label="Music volume"></label>
+  <button id="soundBtn" class="soundbtn is-off" type="button" aria-label="Turn music on" aria-pressed="false">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+      <path d="M4 9.5v5h3.2L12 18.5v-13L7.2 9.5H4z"/>
+      <path class="sound-on" d="M15.2 9.2a3.6 3.6 0 0 1 0 5.6"/>
+      <path class="sound-on" d="M17.4 7a6.4 6.4 0 0 1 0 10"/>
+      <path class="sound-off" d="M16 9l5 6M21 9l-5 6"/>
+    </svg>
+  </button>
+</div>
 <audio id="bgm" loop preload="auto" src="music/theme.mp3"></audio>
-<div class="cue chrome"><s></s>Drag to rotate</div>
 <p id="handHint" class="hand-hint"><span class="hand-open">Make a fist, then open it to expand</span><span class="hand-back">Make a fist to return</span></p>
 <div id="menu" aria-hidden="true">
   <nav class="menu-list" aria-label="Menu">
@@ -1485,7 +1626,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   </div>
 </div>
 <div id="lit">
-  <div class="scrim" data-close></div>
+  <div class="scrim"></div>
   <div class="plate">
     <div class="shot">
       <img id="litImg" alt="">
@@ -1496,11 +1637,9 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       <p class="credit" id="litWhere"></p>
     </div>
   </div>
-  <button class="lit-nav prev" type="button" data-step="-1" aria-label="Previous picture"><svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20 7H10v18h10"/></svg></button>
-  <button class="lit-nav next" type="button" data-step="1" aria-label="Next picture"><svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 7h10v18H12"/></svg></button>
 </div>
 <div id="intro">
-  <video id="film" muted playsinline autoplay preload="auto" disablepictureinpicture webkit-playsinline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260922_195107_ed3f055a-3a13-4a71-b743-e10310454246.mp4"></video>
+  <video id="film" muted playsinline preload="auto" disablepictureinpicture webkit-playsinline></video>
   <div class="fallback"></div>
   <div class="veil"></div>
   <button class="skip" id="skip" type="button">Skip</button>
@@ -1536,7 +1675,12 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     { id: 'hf_20260922_194350_b49aa67e-0401-4029-af4f-f6ac3ee83398', title: 'Listening Posture', place: 'Tanzania · Serengeti', note: 'Ears forward, weight on the back legs. She heard something I never did.' },
     { id: 'hf_20260922_194349_89b82779-3a46-4c55-b7c5-f4a0fd955874', title: 'A Line of Red', place: 'Spain · Fuente de Piedra', note: 'Underexposed by two stops until only the shape survived.' },
     { id: 'hf_20260922_194416_47e18c62-253a-42e1-97a9-9e5f6a6b8d59', title: 'Left Behind', place: 'Studio · Reykjavík', note: 'Found beneath a roost at first light. The only frame in this archive an animal agreed to in advance.', tall: true },
-    { id: 'hf_20260922_194417_a455843c-d8db-461c-8ef6-74a325d2472c', title: 'The Other Side', place: 'Uganda · Kibale Forest', note: 'Taken by a colleague between two long waits. Proof, mostly, that someone is holding the camera.' }
+    { id: 'hf_20260922_194417_a455843c-d8db-461c-8ef6-74a325d2472c', title: 'The Other Side', place: 'Uganda · Kibale Forest', note: 'Taken by a colleague between two long waits. Proof, mostly, that someone is holding the camera.' },
+    { id: 'hf_20260922_194349_b4533691-cb49-41d4-b56c-51f0fdcbe250', title: 'After the Crossing', place: 'Zambia · South Luangwa', note: 'They had already decided the path. I waited on the far bank until the dust settled and the last one looked back.' },
+    { id: 'hf_20260922_194417_2c031e22-2fad-4c81-a544-83cd6bba1c33', title: 'Held in the Wind', place: 'Norway · Lofoten', note: 'The bird held one point in a crosswind for longer than I could keep the frame steady.' },
+    { id: 'hf_20260922_194349_ec830e6f-b8e6-4569-8540-ee7f33902c53', title: 'Still Water', place: 'Zambia · Kafue', note: 'Nothing moved except the reflection. I metered for the dark and let the highlight burn.' },
+    { id: 'hf_20260922_194416_30e307a9-1265-45c3-a1a0-5c6fa5bb9f8d', title: 'The Last Light', place: 'Mongolia · Gobi', note: 'The sun dropped behind a ridge and the animals became outlines. That was the picture.' },
+    { id: 'hf_20260922_194350_b49aa67e-0401-4029-af4f-f6ac3ee83398', title: 'Weight Forward', place: 'Kenya · Amboseli', note: 'One step, then a pause. The pause is where the weight shows, and where the shutter has to be already open.' }
   ];
 
   var stage = document.getElementById('stage');
@@ -1547,7 +1691,6 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   var rows = grid.querySelector('.rows');
   var menu = document.getElementById('menu');
   var menuBtn = document.getElementById('menuBtn');
-  var gridBtn = document.getElementById('gridBtn');
   var lit = document.getElementById('lit');
   var plate = lit.querySelector('.plate');
   var litImg = document.getElementById('litImg');
@@ -1556,6 +1699,9 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   var litNote = document.getElementById('litNote');
   var intro = document.getElementById('intro');
   var video = document.getElementById('film');
+  video.src = window.innerWidth <= 640
+    ? 'video/ovrnite-logo%20intro.resize%20verticle.mp4'
+    : 'video/ovrnite-logo%20intro.resize.mp4';
   var splash = document.getElementById('splash');
   var bar = document.getElementById('bar');
   var dot = document.getElementById('dot');
@@ -1657,9 +1803,9 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   function layout() {
     var w = window.innerWidth;
     var h = window.innerHeight;
-    var hr = w <= 380 ? 0.32 : w <= 640 ? 0.34 : 0.37;
-    var wr = w <= 380 ? 0.42 : w <= 640 ? 0.46 : 0.48;
-    var floor = w <= 380 ? 112 : w <= 640 ? 126 : 140;
+    var hr = w <= 380 ? 0.28 : w <= 640 ? 0.30 : 0.37;
+    var wr = w <= 380 ? 0.36 : w <= 640 ? 0.39 : 0.48;
+    var floor = w <= 380 ? 96 : w <= 640 ? 108 : 140;
     R = Math.max(floor, Math.min(410, h * hr, w * wr));
     var scale = w <= 380 ? 0.46 : w <= 640 ? 0.48 : 0.50;
     var cw = Math.round(Math.max(68, R * scale));
@@ -1690,6 +1836,22 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     return Math.min(1, Math.max(0, y / dist));
   }
 
+  var storyWords = [];
+  var storyLines = document.querySelectorAll('#story .line');
+  for (var si = 0; si < storyLines.length; si++) {
+    var bits = storyLines[si].textContent.trim().split(/\s+/);
+    storyLines[si].textContent = '';
+    storyLines[si].classList.remove('fade-in');
+    for (var wi = 0; wi < bits.length; wi++) {
+      var word = document.createElement('span');
+      word.className = 'word';
+      word.textContent = bits[wi];
+      word.dataset.i = String(storyWords.length);
+      storyWords.push(word);
+      storyLines[si].appendChild(word);
+      if (wi < bits.length - 1) storyLines[si].appendChild(document.createTextNode(' '));
+    }
+  }
   var fadeNodes = document.querySelectorAll('#page .fade-in');
   function riseOf(el) {
     if (reduceMotion) {
@@ -1705,19 +1867,23 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     var e = t * t * (3 - 2 * t);
     el.style.setProperty('--rise', e.toFixed(3));
   }
-  function riseLine(el) {
+  function riseWord(el) {
     if (reduceMotion) {
       el.style.setProperty('--rise', '1');
       return;
     }
-    var rect = el.getBoundingClientRect();
+    var block = el.closest('.story-inner') || el;
+    var rect = block.getBoundingClientRect();
     var view = window.innerHeight;
+    var n = Math.max(1, storyWords.length);
+    var idx = Number(el.dataset.i) || 0;
     var start = view * 0.86;
-    var end = view * 0.46;
+    var end = view * 0.06;
     var t = (start - rect.top) / (start - end);
-    if (t < 0) t = 0;
-    else if (t > 1) t = 1;
-    var e = t * t * (3 - 2 * t);
+    var local = t * n - idx;
+    if (local < 0) local = 0;
+    else if (local > 1) local = 1;
+    var e = local * local * (3 - 2 * local);
     el.style.setProperty('--rise', e.toFixed(3));
   }
 
@@ -1802,7 +1968,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     var hero = heroFade();
     document.documentElement.style.setProperty('--hero', hero.toFixed(4));
     document.body.classList.toggle('hero-gone', hero > 0.92);
-    var parked = document.body.classList.contains('gridview') || document.body.classList.contains('returning');
+    var parked = document.body.classList.contains('gridview') || document.body.classList.contains('returning') || document.body.classList.contains('lit');
     if (parked) {
       stage.style.opacity = '';
       stage.style.pointerEvents = '';
@@ -1812,10 +1978,8 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       stage.style.opacity = (1 - hero).toFixed(3);
       stage.style.pointerEvents = hero > 0.98 ? 'none' : '';
     }
-    for (var fi = 0; fi < fadeNodes.length; fi++) {
-      if (fadeNodes[fi].classList.contains('line')) riseLine(fadeNodes[fi]);
-      else riseOf(fadeNodes[fi]);
-    }
+    for (var fi = 0; fi < fadeNodes.length; fi++) riseOf(fadeNodes[fi]);
+    for (var sw = 0; sw < storyWords.length; sw++) riseWord(storyWords[sw]);
 
     var camZTarget = p * Math.min(64, R * 0.12);
     camZ += (camZTarget - camZ) * 0.075;
@@ -1863,6 +2027,8 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     cx += (tx - cx) * 0.2;
     cy += (ty - cy) * 0.2;
     dot.style.transform = 'translate3d(' + cx + 'px,' + cy + 'px,0)';
+    var zoomTarget = document.body.classList.contains('lit') ? 1.9 : 1;
+    starZoom += (zoomTarget - starZoom) * (reduceMotion ? 1 : 0.07);
     drawStars(sx, sy, hero);
     stepGrid();
   }
@@ -1870,6 +2036,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   var sky = document.getElementById('sky');
   var skyCtx = sky.getContext('2d');
   var stars = [];
+  var starZoom = 1;
   function starCount() {
     var w = window.innerWidth;
     if (w <= 380) return 700;
@@ -1915,9 +2082,11 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     }
     skyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     skyCtx.clearRect(0, 0, w, h);
-    if (hero > 0.98 || document.body.classList.contains('gridview')) return;
+    var litOpen = document.body.classList.contains('lit');
+    if ((hero > 0.98 || document.body.classList.contains('gridview')) && !litOpen) return;
     if (!stars.length) buildStars();
-    var span = Math.max(w, h) * 0.86;
+    var span = Math.max(w, h) * 0.86 * starZoom;
+    var starScale = 0.72 + starZoom * 0.28;
     var drift = [
       { k: 0.18, f: 0.86 },
       { k: 0.32, f: 1 },
@@ -1960,11 +2129,12 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       if (s.bright) {
         skyCtx.globalAlpha = alpha * 0.28;
         skyCtx.beginPath();
-        skyCtx.arc(px, py, s.size * 1.35, 0, 6.2832);
+        skyCtx.arc(px, py, s.size * starScale * 1.35, 0, 6.2832);
         skyCtx.fill();
       }
       skyCtx.globalAlpha = alpha;
-      skyCtx.fillRect(px - s.size * 0.5, py - s.size * 0.5, s.size, s.size);
+      var dotSize = s.size * starScale;
+      skyCtx.fillRect(px - dotSize * 0.5, py - dotSize * 0.5, dotSize, dotSize);
     }
     skyCtx.globalAlpha = 1;
   }
@@ -2350,6 +2520,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       lx: e.clientX,
       ly: e.clientY,
       card: e.target.closest ? e.target.closest('.card') : null,
+      core: !!(e.target.closest && e.target.closest('#headline .core')),
       moved: 0,
       drag: e.pointerType !== 'touch',
       scroll: false,
@@ -2377,10 +2548,10 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       if (active.globe) {
         active.drag = true;
         dragging = true;
-        dragX -= tdx * 0.13;
-        dragY -= tdy * 0.13;
-        velX = -dx * 0.13;
-        velY = -dy * 0.13;
+        dragX += tdx * 0.13;
+        dragY += tdy * 0.13;
+        velX = dx * 0.13;
+        velY = dy * 0.13;
         clampPitch();
         try { stage.setPointerCapture(e.pointerId); } catch (err) {}
         return;
@@ -2396,10 +2567,10 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       return;
     }
     if (!active.drag) return;
-    dragX -= dx * 0.13;
-    dragY -= dy * 0.13;
-    velX = -dx * 0.13;
-    velY = -dy * 0.13;
+    dragX += dx * 0.13;
+    dragY += dy * 0.13;
+    velX = dx * 0.13;
+    velY = dy * 0.13;
     clampPitch();
   });
   stage.addEventListener('touchmove', function (e) {
@@ -2409,6 +2580,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     if (!active || e.pointerId !== active.id) return;
     var slop = window.matchMedia('(pointer: coarse)').matches ? 14 : 6;
     var card = active.card;
+    var hitCore = active.core;
     var moved = active.moved;
     var wasScroll = active.scroll;
     dragging = false;
@@ -2417,6 +2589,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       if (Math.abs(scrollVel) > 0.5) scrollGlide = true;
       return;
     }
+    if (!cancelled && hitCore && moved <= slop) { enterGrid(); return; }
     if (!cancelled && card && moved <= slop) openShot(Number(card.dataset.idx), card);
   }
   stage.addEventListener('pointerup', function (e) { endDrag(e, false); });
@@ -2499,9 +2672,9 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     var midImg = make(litImg.currentSrc || litImg.src);
     var leftImg = make(cardSrc(prev));
     var rightImg = make(cardSrc(next));
-    midImg.style.zIndex = '1';
-    leftImg.style.zIndex = '2';
-    rightImg.style.zIndex = '3';
+    midImg.style.zIndex = '3';
+    leftImg.style.zIndex = '1';
+    rightImg.style.zIndex = '2';
     document.body.appendChild(stage);
     var full = new Image();
     full.onload = function () {
@@ -2510,17 +2683,28 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     };
     full.src = CDN + SHOTS[incomingIdx].id + '.png';
     var ease = 'cubic-bezier(.22,.61,.36,1)';
-    var leftShift = Math.round(-rect.width * 0.38);
-    var minLeft = Math.round(-rect.width * 0.58 - rect.left);
-    if (leftShift < minLeft) leftShift = minLeft;
-    var rightShift = stacked
-      ? Math.round(rect.width * 0.55)
-      : Math.round((meta.left - rect.left) + meta.width * 0.3);
-    var maxRight = Math.round(window.innerWidth - rect.left - rect.width * 0.34);
-    if (rightShift > maxRight) rightShift = maxRight;
-    var leftPose = 'translate3d(' + leftShift + 'px,6px,0) rotateY(34deg) rotateZ(-8deg) scale(.98)';
-    var midPose = 'translate3d(' + Math.round(rect.width * 0.5) + 'px,0,0) rotateY(0deg) rotateZ(-1deg)';
-    var rightPose = 'translate3d(' + rightShift + 'px,10px,0) rotateY(-34deg) rotateZ(8deg) scale(.98)';
+    var W = rect.width;
+    var pad = 16;
+    var gap = Math.max(16, Math.round(W * 0.06));
+    var centerScale = 1;
+    var sideScale = Math.min(0.92, (window.innerWidth - pad * 2 - W - gap * 2) / (2 * W * 1.12));
+    if (!(sideScale >= 0.46)) {
+      gap = Math.max(12, Math.round(window.innerWidth * 0.025));
+      var fit = Math.min(1, window.innerWidth / (W * (1 + 2 * 0.7 * 1.12) + gap * 2 + pad * 2));
+      centerScale = fit;
+      sideScale = fit * 0.7;
+    }
+    var sideVisual = W * sideScale;
+    var groupW = sideVisual * 2 + gap * 2 + W * centerScale;
+    var wantLeft = (window.innerWidth - groupW) / 2 + sideVisual + gap;
+    var midShift = wantLeft - rect.left - W / 2 * (1 - centerScale);
+    var centerVisualLeft = rect.left + W / 2 + midShift - W * centerScale / 2;
+    var centerVisualRight = centerVisualLeft + W * centerScale;
+    var leftShift = centerVisualLeft - gap - rect.left - W / 2 - W * sideScale / 2;
+    var rightShift = centerVisualRight + gap - rect.left - W / 2 + W * sideScale / 2;
+    var leftPose = 'translate3d(' + Math.round(leftShift) + 'px,6px,0) rotateY(34deg) rotateZ(-8deg) scale(' + sideScale.toFixed(3) + ')';
+    var midPose = 'translate3d(' + Math.round(midShift) + 'px,0,0) rotateY(0deg) rotateZ(-1deg) scale(' + centerScale.toFixed(3) + ')';
+    var rightPose = 'translate3d(' + Math.round(rightShift) + 'px,10px,0) rotateY(-34deg) rotateZ(8deg) scale(' + sideScale.toFixed(3) + ')';
     var flat = 'translate3d(0,0,0) rotateY(0deg) rotateZ(0deg) scale(1)';
     leftImg.style.opacity = '0';
     rightImg.style.opacity = '0';
@@ -2636,14 +2820,12 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     lit.classList.remove('closing');
     document.body.classList.add('lit');
     lockScroll();
-    menuBtn.setAttribute('aria-label', document.body.classList.contains('invert') ? 'Restore colors' : 'Invert colors');
     var end = plate.querySelector('.shot').getBoundingClientRect();
     flyImage(fromRect, end);
   }
   function closeShot() {
     if (!document.body.classList.contains('lit')) return;
     shotSliding = false;
-    document.body.classList.remove('invert');
     menuBtn.setAttribute('aria-label', 'Open menu');
     var stage = document.querySelector('.slide-stage');
     if (stage && stage.parentNode) stage.parentNode.removeChild(stage);
@@ -2668,13 +2850,21 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       lit.classList.remove('closing');
     }, 1000);
   }
+  var litSwipe = null;
+  lit.addEventListener('pointerdown', function (e) {
+    if (!document.body.classList.contains('lit')) return;
+    litSwipe = { id: e.pointerId, x: e.clientX, y: e.clientY };
+  });
+  lit.addEventListener('pointerup', function (e) {
+    if (!litSwipe || e.pointerId !== litSwipe.id) return;
+    var dx = e.clientX - litSwipe.x;
+    var dy = e.clientY - litSwipe.y;
+    litSwipe = null;
+    if (dy > 64 && dy > Math.abs(dx)) returnHero();
+  });
   lit.addEventListener('click', function (e) {
     var stepBtn = e.target.closest && e.target.closest('[data-step]');
-    if (stepBtn) {
-      stepShot(Number(stepBtn.getAttribute('data-step')));
-      return;
-    }
-    if (e.target === lit || (e.target.closest && e.target.closest('[data-close]'))) closeShot();
+    if (stepBtn) stepShot(Number(stepBtn.getAttribute('data-step')));
   });
   grid.addEventListener('click', function (e) {
     if (gridSwallow) { gridSwallow = false; return; }
@@ -2731,15 +2921,29 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     gridDrag = null;
     gridMoved = 0;
   });
+  var litWheel = 0;
+  function returnHero() {
+    if (document.body.classList.contains('lit')) closeShot();
+    if (document.body.classList.contains('gridview')) leaveGrid();
+    if (menu.classList.contains('open')) closeMenu({ holdHeader: window.scrollY > 6 });
+    if (window.scrollY > 6) window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  }
   window.addEventListener('wheel', function (e) {
     if (document.body.classList.contains('lit') && !document.body.classList.contains('menu-open')) {
       e.preventDefault();
       var dx = e.deltaX;
       var dy = e.deltaY;
-      if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
-      slideShot(Math.abs(dx) > Math.abs(dy) ? dx : dy);
+      if (dy > 0 && Math.abs(dy) >= Math.abs(dx)) {
+        litWheel += dy;
+        if (litWheel > 36) { litWheel = 0; returnHero(); }
+        return;
+      }
+      litWheel = 0;
+      if (Math.abs(dx) < 12) return;
+      if (Math.abs(dx) > Math.abs(dy)) slideShot(dx);
       return;
     }
+    litWheel = 0;
     if (!document.body.classList.contains('gridview')) return;
     e.preventDefault();
     var unit = e.deltaMode === 1 ? 32 : (e.deltaMode === 2 ? window.innerHeight : 1);
@@ -2819,7 +3023,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       title: 'Start a conversation.',
       body: [
         'Ovrnite works with founders, teams and businesses, whether the brief is new or already in the world.',
-        'UK, USA, SA'
+        'London and New York.'
       ],
       mail: 'ovrniteinc@gmail.com'
     }
@@ -2987,15 +3191,20 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     menuBtn.setAttribute('aria-label', 'Close menu');
   }
   function toggleMenu() {
-    if (document.body.classList.contains('lit')) {
-      document.body.classList.toggle('invert');
-      menuBtn.setAttribute('aria-label', document.body.classList.contains('invert') ? 'Restore colors' : 'Invert colors');
-      return;
-    }
     if (menu.classList.contains('open')) closeMenu();
     else openMenu();
   }
   menuBtn.addEventListener('click', toggleMenu);
+  var invertBtn = document.getElementById('invertBtn');
+  function paintInvert() {
+    var on = document.body.classList.contains('invert');
+    invertBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    invertBtn.setAttribute('aria-label', on ? 'Restore colors' : 'Invert colors');
+  }
+  invertBtn.addEventListener('click', function () {
+    document.body.classList.toggle('invert');
+    paintInvert();
+  });
   menu.addEventListener('click', function (e) {
     if (e.target.closest && e.target.closest('.studio-back')) {
       leaveStudio();
@@ -3010,9 +3219,12 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     closeMenu();
     if (toGrid) enterGrid();
   });
-  gridBtn.addEventListener('click', function () {
-    if (document.body.classList.contains('gridview')) leaveGrid();
-    else enterGrid();
+  var homeBtn = document.getElementById('homeBtn');
+  homeBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  homeBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    returnHero();
   });
   document.querySelector('.wordmark').addEventListener('click', function (e) {
     e.preventDefault();
@@ -3031,7 +3243,6 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       return;
     }
     if (e.key !== 'Escape') return;
-    if (document.body.classList.contains('lit')) { closeShot(); return; }
     if (menu.classList.contains('reading')) { leaveStudio(); return; }
     if (menu.classList.contains('open')) { closeMenu(); return; }
     if (document.body.classList.contains('gridview')) { leaveGrid(); return; }
@@ -3066,7 +3277,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 
   var born = performance.now();
   var loaded = 0;
-  var TOTAL = 22;
+  var TOTAL = 27;
   var splashDone = false;
   var afterSplash = [];
   var revealed = false;
@@ -3096,7 +3307,6 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     setTimeout(function () {
       if (!splash) return;
       splash.classList.add('out');
-      startFilm();
       var queued = afterSplash.splice(0);
       for (var i = 0; i < queued.length; i++) queued[i]();
       setTimeout(function () {
@@ -3135,7 +3345,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
       window.removeEventListener('touchstart', once);
       if (revealed || videoFailed) return;
       video.muted = true;
-      video.playbackRate = 2;
+      video.playbackRate = 1;
       var p = video.play();
       if (p && p.catch) p.catch(function () {});
     }
@@ -3144,38 +3354,22 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     window.addEventListener('touchstart', once, { passive: true });
   }
 
+  var filmStarted = false;
   function playFromStart() {
+    if (filmStarted || revealed || videoFailed) return;
+    filmStarted = true;
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
     video.setAttribute('webkit-playsinline', '');
-    var started = false;
-    function go() {
-      if (started || revealed || videoFailed) return;
-      started = true;
-      if (video.currentTime > 0.05) {
-        var sought = false;
-        var begin = function () {
-          if (sought) return;
-          sought = true;
-          video.playbackRate = 2;
-          var p = video.play();
-          if (p && p.catch) p.catch(armGesture);
-        };
-        video.addEventListener('seeked', begin, { once: true });
-        try { video.currentTime = 0; } catch (err) { begin(); }
-        setTimeout(begin, 700);
-      } else {
-        video.playbackRate = 2;
-        var p = video.play();
-        if (p && p.catch) p.catch(armGesture);
-      }
-    }
-    go();
+    video.playbackRate = 1;
+    try { video.currentTime = 0; } catch (err) {}
+    var p = video.play();
+    if (p && p.catch) p.catch(armGesture);
   }
 
   function startFilm() {
-    if (revealed || videoFailed) return;
+    if (filmStarted || revealed || videoFailed) return;
     playFromStart();
     setTimeout(function () {
       if (!revealed && video.paused) reveal();
@@ -3194,12 +3388,12 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     else afterSplash.push(go);
   }
 
-  video.addEventListener('play', function () { video.playbackRate = 2; });
+  video.addEventListener('play', function () { video.playbackRate = 1; });
   video.addEventListener('playing', function () {
     var d = video.duration;
     var t = video.currentTime;
     if (!isFinite(d)) return;
-    var ms = Math.max(300, ((d - t - 0.45) / 2) * 1000);
+    var ms = Math.max(300, (d - t - 0.35) * 1000);
     setTimeout(reveal, ms);
   });
   video.addEventListener('ended', function () { reveal(); });
@@ -3214,6 +3408,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     onFilmError();
   });
   if (video.readyState >= 2) markFilm();
+  startFilm();
   document.getElementById('skip').addEventListener('click', function () { reveal(); });
 
   function cardMax() {
@@ -3266,8 +3461,13 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
 
   var bgm = document.getElementById('bgm');
   var soundBtn = document.getElementById('soundBtn');
-  var musicOn = true;
-  bgm.volume = 0.42;
+  var vol = document.getElementById('vol');
+  // Set to true to start with music playing.
+  var MUSIC_ON = false;
+  // Set to true to enable the camera hand-control gesture.
+  var HAND_ON = false;
+  var musicOn = MUSIC_ON;
+  bgm.volume = Number(vol.value) / 100;
   function paintSound() {
     soundBtn.classList.toggle('is-off', !musicOn);
     soundBtn.setAttribute('aria-pressed', musicOn ? 'true' : 'false');
@@ -3278,10 +3478,15 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     var pending = bgm.play();
     if (pending && pending.catch) pending.catch(function () {});
   }
+  paintSound();
   tryMusic();
   document.addEventListener('pointerdown', tryMusic);
   document.addEventListener('keydown', tryMusic);
   soundBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  vol.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  vol.addEventListener('input', function () {
+    bgm.volume = Number(vol.value) / 100;
+  });
   soundBtn.addEventListener('click', function () {
     musicOn = !musicOn;
     if (musicOn) tryMusic();
@@ -3290,6 +3495,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
   });
 
   function startHandGrid() {
+    if (!HAND_ON) return;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
     var video = document.createElement('video');
     video.setAttribute('playsinline', '');
@@ -3450,7 +3656,7 @@ body.lit .lit-nav{opacity:1;transition:opacity .45s ease .4s, color .3s ease}
     }
     later(200);
   }
-  startHandGrid();
+  if (HAND_ON) startHandGrid();
 })();
 </script>
 </body>
